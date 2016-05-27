@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="Parkour:jar">
+    <output-path>$USER_HOME$/Downloads</output-path>
+    <root id="archive" name="Parkour.jar">
+      <element id="module-output" name="Parkour" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/net/extrillius/parkour/ExtrilliusParkour.java" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/net/extrillius/parkour/plugin.yml" />
+    </root>
+  </artifact>
+</component>
