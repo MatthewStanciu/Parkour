@@ -31,7 +31,7 @@ public class ExtrilliusParkour extends JavaPlugin implements Listener {
 
         getServer().getPluginManager().registerEvents(this, this);
     }
-
+    //Building Permissions
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         Player p = event.getPlayer();
@@ -69,6 +69,7 @@ public class ExtrilliusParkour extends JavaPlugin implements Listener {
             }
         }
     }
+    //umm...Join Signs (I think?)
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
         if (event.getLine(0).equalsIgnoreCase("[Join]") && getConfig().contains("maps." + event.getLine(1))) {
@@ -80,6 +81,7 @@ public class ExtrilliusParkour extends JavaPlugin implements Listener {
             event.setLine(1, "§b" + event.getLine(1));
         }
     }
+    //Menu Items Within Maps
     @EventHandler
     public void onClick(PlayerInteractEvent event) {
         ItemStack leaveStick = new ItemStack(Material.STICK, 1);
@@ -130,7 +132,7 @@ public class ExtrilliusParkour extends JavaPlugin implements Listener {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         Player p = (Player) sender;
         Location location = p.getLocation();
-
+        //set parkour starting point
         if (cmd.getName().equalsIgnoreCase("startingpoint")) {
             if (!(sender.hasPermission("parkour.build"))) {
                 sender.sendMessage(ChatColor.AQUA + "You don't have a build license!"); // add clickable links in the future
@@ -156,7 +158,7 @@ public class ExtrilliusParkour extends JavaPlugin implements Listener {
             getConfig().set("maps." + args[0] + ".startingpoint.Z", location.getZ());
             p.sendMessage(ChatColor.AQUA + "Starting point set.");
         }
-
+        //set parkour checkpoint
         if (cmd.getName().equalsIgnoreCase("checkpoint") || cmd.getName().equalsIgnoreCase("cp")) {
             if (!(sender.hasPermission("parkour.build"))) {
                 sender.sendMessage(ChatColor.AQUA + "You don't have a build license!"); // add clickable links in the future
@@ -182,7 +184,7 @@ public class ExtrilliusParkour extends JavaPlugin implements Listener {
             getConfig().set("maps." + args[0] + ".checkpoints." + args[1] + ".Z", location.getZ());
             p.sendMessage(ChatColor.AQUA + "Checkpoint " + ChatColor.GREEN + args[1] + ChatColor.AQUA + " set.");
         }
-
+        //set parkour finish point
         if (cmd.getName().equalsIgnoreCase("finishpoint")) {
             if (!(sender.hasPermission("parkour.build"))) {
                 sender.sendMessage(ChatColor.AQUA + "You don't have a build license!"); // add clickable links in the future
@@ -204,7 +206,7 @@ public class ExtrilliusParkour extends JavaPlugin implements Listener {
             getConfig().set("maps." + args[0] + ".finishpoint.Y", location.getY());
             getConfig().set("maps." + args[0] + ".finishpoint.Z", location.getZ());
         }
-
+        //finish map
         if (cmd.getName().equalsIgnoreCase("finish")) {
             if (!(sender.hasPermission("parkour.build"))) {
                 sender.sendMessage(ChatColor.AQUA + "You don't have a build license!"); // add clickable links in the future
