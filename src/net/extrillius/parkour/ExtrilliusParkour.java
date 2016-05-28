@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -35,31 +36,37 @@ public class ExtrilliusParkour extends JavaPlugin implements Listener {
     public void onBlockPlace(BlockPlaceEvent event) {
         Player p = event.getPlayer();
         if (!(p.hasPermission("parkour.admin"))) {
-            p.sendMessage(ChatColor.RED + "Only admins can freely build!");
-            p.sendMessage(ChatColor.RED + "Try typing " + ChatColor.AQUA + "/build");
-        }
-        if (!(p.hasPermission("parkour.build"))) {
-            p.sendMessage(ChatColor.AQUA + "You don't have a build license!"); // add clickable links in the future
-            p.sendMessage(ChatColor.AQUA + "You can purchase one from the shop in the hub");
-            p.sendMessage(ChatColor.AQUA + "or you can purchase the $50 rank from our Buycraft page!");
+            if (p.hasPermission("parkour.build")) {
+                p.sendMessage(ChatColor.AQUA + "Only admins can build freely!");
+                p.sendMessage(ChatColor.AQUA + "Type " + ChatColor.GREEN + "/build" + ChatColor.AQUA +
+                        " to build your own maps!");
+            }
+            if (!(p.hasPermission("parkour.build"))) {
+                p.sendMessage(ChatColor.AQUA + "You don't have a build license!");
+                p.sendMessage(ChatColor.AQUA + "You can purchase one from the shop in the hub");
+                p.sendMessage(ChatColor.AQUA + "or you can purchase it from our Buycraft store!");
+            }
         }
     }
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         Player p = event.getPlayer();
         if (!(p.hasPermission("parkour.admin"))) {
-            p.sendMessage(ChatColor.RED + "Only admins can freely build!");
-            p.sendMessage(ChatColor.RED + "Try typing " + ChatColor.AQUA + "/build");
-        }
-        if (!(p.hasPermission("parkour.build"))) {
-            p.sendMessage(ChatColor.AQUA + "You don't have a build license!"); // add clickable links in the future
-            p.sendMessage(ChatColor.AQUA + "You can purchase one from the shop in the hub");
-            p.sendMessage(ChatColor.AQUA + "or you can purchase the $50 rank from our Buycraft page!");
-        }
-        if (p.getGameMode() == GameMode.CREATIVE) {
-            event.setCancelled(true);
-            p.setGameMode(GameMode.SURVIVAL);
-            p.sendMessage(ChatColor.AQUA + "Try again in survival mode.");
+            if (p.hasPermission("parkour.build")) {
+                p.sendMessage(ChatColor.AQUA + "Only admins can build freely!");
+                p.sendMessage(ChatColor.AQUA + "Type " + ChatColor.GREEN + "/build" + ChatColor.AQUA +
+                        " to build your own maps!");
+            }
+            if (!(p.hasPermission("parkour.build"))) {
+                p.sendMessage(ChatColor.AQUA + "You don't have a build license!");
+                p.sendMessage(ChatColor.AQUA + "You can purchase one from the shop in the hub");
+                p.sendMessage(ChatColor.AQUA + "or you can purchase it from our Buycraft store!");
+            }
+            if (event.getBlock().getType() == Material.WALL_SIGN) {
+                if (p.getGameMode() == GameMode.CREATIVE) {
+                    event.setCancelled(true);
+                }
+            }
         }
     }
     @EventHandler
@@ -75,9 +82,6 @@ public class ExtrilliusParkour extends JavaPlugin implements Listener {
     }
     @EventHandler
     public void onClick(PlayerInteractEvent event) {
-        double x = getConfig().getDouble("startingpoint.X");
-        double y = getConfig().getDouble("startingpoint.Y");
-        double z = getConfig().getDouble("startingpoint.Z");
         ItemStack leaveStick = new ItemStack(Material.STICK, 1);
         ItemMeta leaveMeta = leaveStick.getItemMeta();
         leaveMeta.setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "Leave the map");
@@ -97,6 +101,10 @@ public class ExtrilliusParkour extends JavaPlugin implements Listener {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK) {
             if (event.getClickedBlock().getType() == Material.WALL_SIGN) {
                 Sign clickedSign = (Sign) event.getClickedBlock().getState();
+
+                double x = getConfig().getDouble("maps." + clickedSign.getLine(1) + ".startingpoint.X");
+                double y = getConfig().getDouble("maps." + clickedSign.getLine(1) + ".startingpoint.Y");
+                double z = getConfig().getDouble("maps." + clickedSign.getLine(1) + ".startingpoint.Z");
 
                 if (clickedSign.getLine(0).equals("§7[§bJoin§7]")) {
                     p.teleport(new Location(p.getWorld(), x, y, z));
@@ -256,6 +264,73 @@ public class ExtrilliusParkour extends JavaPlugin implements Listener {
                     p.sendMessage(ChatColor.AQUA + "Oops! You're still missing your " + ChatColor.GREEN +
                             "finish point" + ChatColor.AQUA + "!");
                 }
+            }
+        }
+
+        if (cmd.getName().equalsIgnoreCase("deathblock")) {
+            if (!(sender.hasPermission("parkour.build"))) {
+                sender.sendMessage(ChatColor.AQUA + "You don't have a build license!"); // add clickable links in the future
+                sender.sendMessage(ChatColor.AQUA + "You can purchase one from the shop in the hub");
+                sender.sendMessage(ChatColor.AQUA + "or you can purchase the $50 rank from our Buycraft page!");
+                return false;
+            }
+            if (args.length != 1) {
+                p.sendMessage(ChatColor.RED + "Usage:");
+                p.sendMessage(ChatColor.AQUA + "/deathblock <mapname>");
+                p.sendMessage(ChatColor.AQUA + "Remember to stand on your designated death block!");
+                return false;
+            }
+            if (location == null) {
+                p.sendMessage("You must be a player to use this command!");
+                return false;
+            }
+
+            getConfig().set("maps." + args[0] + ".deathblock", location.getBlock().getRelative(BlockFace.DOWN));
+            p.sendMessage(ChatColor.AQUA + "Death block set!");
+        }
+
+        if (cmd.getName().equalsIgnoreCase("join")) {
+            if (args.length != 1) {
+                p.sendMessage(ChatColor.RED + "Usage:");
+                p.sendMessage(ChatColor.AQUA + "/join <mapname>");
+                return false;
+            }
+            double x = getConfig().getDouble("maps." + args[0] + ".startingpoint.X");
+            double y = getConfig().getDouble("maps." + args[0] + ".startingpoint.Y");
+            double z = getConfig().getDouble("maps." + args[0] + ".startingpoint.Z");
+            ItemStack leaveStick = new ItemStack(Material.STICK, 1);
+            ItemMeta leaveMeta = leaveStick.getItemMeta();
+            leaveMeta.setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "Leave the map");
+            leaveStick.setItemMeta(leaveMeta);
+
+            ItemStack killArrow = new ItemStack(Material.ARROW, 1);
+            ItemMeta killMeta = killArrow.getItemMeta();
+            killMeta.setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "Suicide");
+            killArrow.setItemMeta(killMeta);
+
+            ItemStack compass = new ItemStack(Material.COMPASS);
+            ItemMeta compassMeta = compass.getItemMeta();
+            compassMeta.setDisplayName(ChatColor.GOLD + "Server Selector " + ChatColor.GRAY + "(Right click)");
+            compass.setItemMeta(compassMeta);
+
+            if (!(getConfig().contains(args[0]))) {
+                p.sendMessage(ChatColor.AQUA + "That map does not exist!");
+                return false;
+            }
+            else {
+                p.teleport(new Location(p.getWorld(), x, y, z));
+                p.sendMessage(ChatColor.AQUA + "Joined " + ChatColor.GREEN + args[0]);
+                joined = true;
+            }
+
+            if (joined) {
+                p.getInventory().clear();
+                p.getInventory().setItem(9, leaveStick);
+                p.getInventory().setItem(5, killArrow);
+            }
+            else {
+                p.getInventory().clear();
+                p.getInventory().setItem(5, compass);
             }
         }
 
