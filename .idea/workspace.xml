@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e8224487-07fc-4fe4-a218-6563d462027c" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/net/extrillius/parkour/ExtrilliusParkour.java" afterPath="$PROJECT_DIR$/src/net/extrillius/parkour/ExtrilliusParkour.java" />
     </list>
@@ -29,8 +28,8 @@
       <file leaf-file-name="ExtrilliusParkour.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/ExtrilliusParkour.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-338">
-              <caret line="115" column="17" selection-start-line="115" selection-start-column="17" selection-end-line="115" selection-end-column="17" />
+            <state relative-caret-position="187">
+              <caret line="71" column="11" selection-start-line="71" selection-start-column="11" selection-end-line="71" selection-end-column="11" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -405,6 +404,14 @@
       <option name="presentableId" value="Default" />
       <updated>1464360527926</updated>
     </task>
+    <task id="LOCAL-00001" summary="Added joined + deathblock. Unsure how to check for interaction with death block">
+      <created>1464396238245</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1464396238245</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -447,6 +454,10 @@
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Added joined + deathblock. Unsure how to check for interaction with death block" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added joined + deathblock. Unsure how to check for interaction with death block" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
     <watches-manager />
@@ -466,8 +477,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/ExtrilliusParkour.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-338">
-          <caret line="115" column="17" selection-start-line="115" selection-start-column="17" selection-end-line="115" selection-end-column="17" />
+        <state relative-caret-position="187">
+          <caret line="71" column="11" selection-start-line="71" selection-start-column="11" selection-end-line="71" selection-end-column="11" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

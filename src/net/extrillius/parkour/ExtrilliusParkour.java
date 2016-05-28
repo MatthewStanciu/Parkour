@@ -69,7 +69,7 @@ public class ExtrilliusParkour extends JavaPlugin implements Listener {
             }
         }
     }
-    //umm...Join Signs (I think?)
+    //signs
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
         if (event.getLine(0).equalsIgnoreCase("[Join]") && getConfig().contains("maps." + event.getLine(1))) {
