@@ -28,8 +28,8 @@
       <file leaf-file-name="ExtrilliusParkour.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/ExtrilliusParkour.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="71" column="22" selection-start-line="71" selection-start-column="22" selection-end-line="71" selection-end-column="22" />
+            <state relative-caret-position="-2018">
+              <caret line="69" column="12" selection-start-line="69" selection-start-column="12" selection-end-line="69" selection-end-column="12" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -418,7 +418,14 @@
       <option name="project" value="LOCAL" />
       <updated>1464469318759</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="updated comments again">
+      <created>1464469517126</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1464469517126</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -464,7 +471,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Added joined + deathblock. Unsure how to check for interaction with death block" />
     <MESSAGE value="updated comments" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated comments" />
+    <MESSAGE value="updated comments again" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated comments again" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -485,8 +493,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/ExtrilliusParkour.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="71" column="22" selection-start-line="71" selection-start-column="22" selection-end-line="71" selection-end-column="22" />
+        <state relative-caret-position="-2018">
+          <caret line="69" column="12" selection-start-line="69" selection-start-column="12" selection-end-line="69" selection-end-column="12" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

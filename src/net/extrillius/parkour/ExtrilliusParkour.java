@@ -62,11 +62,12 @@ public class ExtrilliusParkour extends JavaPlugin implements Listener {
                 p.sendMessage(ChatColor.AQUA + "You can purchase one from the shop in the hub");
                 p.sendMessage(ChatColor.AQUA + "or you can purchase it from our Buycraft store!");
             }
-            if (event.getBlock().getType() == Material.WALL_SIGN) {
+            if (event.getBlock().getType() == Material.WALL_SIGN && !build && !joined) {
                 if (p.getGameMode() == GameMode.CREATIVE) {
                     event.setCancelled(true);
                 }
             }
+            
         }
     }
     //Setting up signs
@@ -325,7 +326,7 @@ public class ExtrilliusParkour extends JavaPlugin implements Listener {
                 joined = true;
             }
 
-            if (joined) {
+            if (joined) { // condition "joined" is always true?
                 p.getInventory().clear();
                 p.getInventory().setItem(9, leaveStick);
                 p.getInventory().setItem(5, killArrow);
