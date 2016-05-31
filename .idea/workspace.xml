@@ -28,8 +28,8 @@
       <file leaf-file-name="ExtrilliusParkour.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/ExtrilliusParkour.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="9" column="4" selection-start-line="9" selection-start-column="4" selection-end-line="9" selection-end-column="4" />
+            <state relative-caret-position="315">
+              <caret line="21" column="60" selection-start-line="21" selection-start-column="60" selection-end-line="21" selection-end-column="60" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -432,7 +432,14 @@
       <option name="project" value="LOCAL" />
       <updated>1464485909194</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="reset">
+      <created>1464721562053</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1464721562053</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -480,7 +487,8 @@
     <MESSAGE value="updated comments" />
     <MESSAGE value="updated comments again" />
     <MESSAGE value="added comments and clarified some code" />
-    <option name="LAST_COMMIT_MESSAGE" value="added comments and clarified some code" />
+    <MESSAGE value="reset" />
+    <option name="LAST_COMMIT_MESSAGE" value="reset" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -535,10 +543,21 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://$USER_HOME$/Downloads/spigot-1.8.jar!/org/bukkit/plugin/java/JavaPlugin.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-830">
+          <caret line="306" column="19" selection-start-line="306" selection-start-column="19" selection-end-line="306" selection-end-column="19" />
+          <folding>
+            <element signature="e#11511#11512#0" expanded="true" />
+            <element signature="e#11539#11540#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/ExtrilliusParkour.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="4" selection-start-line="9" selection-start-column="4" selection-end-line="9" selection-end-column="4" />
+        <state relative-caret-position="315">
+          <caret line="21" column="60" selection-start-line="21" selection-start-column="60" selection-end-line="21" selection-end-column="60" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
