@@ -18,6 +18,8 @@ commands:
     description: Set the death blocks for your map
   finish:
     description: Check to see if your created map is finished.
+  join:
+    description: Join a map
 
 permissions:
   parkour.build:

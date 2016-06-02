@@ -4,6 +4,7 @@
     <list default="true" id="e8224487-07fc-4fe4-a218-6563d462027c" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/net/extrillius/parkour/Parkour.java" afterPath="$PROJECT_DIR$/src/net/extrillius/parkour/Parkour.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/net/extrillius/parkour/plugin.yml" afterPath="$PROJECT_DIR$/src/net/extrillius/parkour/plugin.yml" />
     </list>
     <ignored path="Parkour.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -28,8 +29,8 @@
       <file leaf-file-name="Parkour.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/Parkour.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2077">
-              <caret line="172" column="29" selection-start-line="172" selection-start-column="29" selection-end-line="172" selection-end-column="29" />
+            <state relative-caret-position="435">
+              <caret line="29" column="41" selection-start-line="29" selection-start-column="41" selection-end-line="29" selection-end-column="41" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -41,7 +42,7 @@
         <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/plugin.yml">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="315">
-              <caret line="21" column="12" selection-start-line="21" selection-start-column="12" selection-end-line="21" selection-end-column="12" />
+              <caret line="21" column="27" selection-start-line="21" selection-start-column="27" selection-end-line="21" selection-end-column="27" />
               <folding />
             </state>
           </provider>
@@ -527,7 +528,14 @@
       <option name="project" value="LOCAL" />
       <updated>1464874581178</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Creation aspect finished">
+      <created>1464885622162</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1464885622162</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -588,7 +596,8 @@
     <MESSAGE value="made a typo" />
     <MESSAGE value="added a few comments and fixed somet things" />
     <MESSAGE value="fixed some things that i caught because i'm so good" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed some things that i caught because i'm so good" />
+    <MESSAGE value="Creation aspect finished" />
+    <option name="LAST_COMMIT_MESSAGE" value="Creation aspect finished" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -705,15 +714,15 @@
     <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/plugin.yml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="315">
-          <caret line="21" column="12" selection-start-line="21" selection-start-column="12" selection-end-line="21" selection-end-column="12" />
+          <caret line="21" column="27" selection-start-line="21" selection-start-column="27" selection-end-line="21" selection-end-column="27" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/Parkour.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2077">
-          <caret line="172" column="29" selection-start-line="172" selection-start-column="29" selection-end-line="172" selection-end-column="29" />
+        <state relative-caret-position="435">
+          <caret line="29" column="41" selection-start-line="29" selection-start-column="41" selection-end-line="29" selection-end-column="41" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

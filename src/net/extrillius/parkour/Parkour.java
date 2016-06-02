@@ -3,15 +3,21 @@ package net.extrillius.parkour;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /*
  * Created by TechBug2012 on 5/27/16.
@@ -20,14 +26,45 @@ public class Parkour extends JavaPlugin implements Listener {
 
     /*
     TODO: Add a /add command for people with build licenses.
-    TODO: an addDefault option must exist, I guess...
+    TODO: Find a way to get the map name and make an onJoin method that handles everything that happens in a map,
+    TODO: ...including the player boolean
     */
-    private ArrayList<Block> deathBlocks = new ArrayList<>();
+    private ArrayList<Material> deathBlocks = new ArrayList<>();
+    private Set<String> joinedPlayers = new HashSet<>();
+
 
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
 
         this.saveDefaultConfig();
+    }
+
+    public void setMapInv(Player p) {
+        ItemStack deathArrow = new ItemStack(Material.ARROW, 1);
+        ItemMeta arrowMeta = deathArrow.getItemMeta();
+        arrowMeta.setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "Suicide");
+        p.getInventory().setItem(2, deathArrow);
+
+        ItemStack visBall = new ItemStack(Material.SLIME_BALL, 1);
+        ItemMeta ballMeta = visBall.getItemMeta();
+        ballMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "Players are visible");
+        p.getInventory().setItem(5, visBall);
+
+        ItemStack leaveStick = new ItemStack(Material.STICK, 1);
+        ItemMeta stickMeta = leaveStick.getItemMeta();
+        stickMeta.setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "Leave the map");
+        p.getInventory().setItem(7, leaveStick);
+    }
+    public void setLobbyInv(Player p) {
+        ItemStack serverCompass = new ItemStack(Material.COMPASS, 1);
+        ItemMeta compassMeta = serverCompass.getItemMeta();
+        compassMeta.setDisplayName(ChatColor.GOLD + "Server Selector " + ChatColor.GRAY + "(Right click)");
+        p.getInventory().setItem(2, serverCompass);
+
+        ItemStack shopEmerald = new ItemStack(Material.EMERALD, 1);
+        ItemMeta emeraldMeta = shopEmerald.getItemMeta();
+        emeraldMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "Server Shop");
+        p.getInventory().setItem(5, shopEmerald);
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -165,14 +202,14 @@ public class Parkour extends JavaPlugin implements Listener {
                 return false;
             }
             else {
-                Block deathBlock = location.getBlock().getRelative(BlockFace.DOWN);
+                Material deathBlock = location.getBlock().getRelative(BlockFace.DOWN).getType();
                 p.sendMessage(ChatColor.AQUA + "When you are finished, type " +
                         ChatColor.GREEN + "/finish <map>");
                 deathBlocks.add(deathBlock);
                 getConfig().set("maps." + args[0] + ".deathblocks", deathBlocks);
                 saveConfig();
                 p.sendMessage(ChatColor.AQUA + "Death block " +
-                        ChatColor.GREEN + deathBlock.getType().toString().toLowerCase() +
+                        ChatColor.GREEN + deathBlock.toString().toLowerCase() +
                         ChatColor.AQUA + " has been added.");
             }
         }
@@ -191,7 +228,7 @@ public class Parkour extends JavaPlugin implements Listener {
                 return false;
             }
             else {
-                if (!(getConfig().contains("maps." + args[0]))) { // this produces an error ingame. why?
+                if (!(getConfig().contains("maps." + args[0]))) {
                     p.sendMessage(ChatColor.RED + "The map " + ChatColor.AQUA + args[0] +
                             ChatColor.RED +
                             " does not exist in the config. " +
@@ -218,6 +255,35 @@ public class Parkour extends JavaPlugin implements Listener {
                                 ChatColor.GREEN + "/add <map> <name>");
                         p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Happy parkouring!");
                     }
+                }
+            }
+        }
+
+        if (cmd.getName().equalsIgnoreCase("join")) {
+            World world = p.getWorld();
+            double startX = getConfig().getDouble("maps." + args[0] + ".startpoint.X");
+            double startY = getConfig().getDouble("maps." + args[0] + ".startpoint.Y");
+            double startZ = getConfig().getDouble("maps." + args[0] + ".startpoint.Z");
+            float startYaw = getConfig().getInt("maps." + args[0] + ".startpoint.YAW");
+            float startPitch = getConfig().getInt("maps." + args[0] + ".startpoint.PITCH");
+            Location mapStart = new Location(world, startX, startY, startZ, startYaw, startPitch);
+            if (args.length != 1) {
+                p.sendMessage(ChatColor.AQUA + "You must specify a map to join.");
+                p.sendMessage(ChatColor.AQUA + "If you are unsure, there are some great maps at spawn!");
+                return false;
+            }
+            else {
+                if (!(getConfig().contains("maps." + args[0]))) {
+                    p.sendMessage(ChatColor.RED + "That map does not exist!");
+                    p.sendMessage(ChatColor.AQUA + "Try spelling it differently; also note that map names must be " +
+                            "case-sensitive.");
+                    return false;
+                }
+                else {
+                    joinedPlayers.add(p.getName());
+                    p.teleport(mapStart);
+                    p.getInventory().clear();
+                    setMapInv(p);
                 }
             }
         }
