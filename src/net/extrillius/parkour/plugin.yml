@@ -14,7 +14,7 @@ commands:
     aliases: cp
   endpoint:
     description: Set the finish point for a created map.
-  deathblocK:
+  deathblock:
     description: Set the death blocks for your map
   finish:
     description: Check to see if your created map is finished.

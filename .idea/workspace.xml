@@ -40,8 +40,8 @@
       <file leaf-file-name="plugin.yml" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/plugin.yml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="17" column="50" selection-start-line="17" selection-start-column="50" selection-end-line="17" selection-end-column="50" />
+            <state relative-caret-position="240">
+              <caret line="16" column="12" selection-start-line="16" selection-start-column="12" selection-end-line="16" selection-end-column="12" />
               <folding />
             </state>
           </provider>
@@ -499,7 +499,14 @@
       <option name="project" value="LOCAL" />
       <updated>1464873961168</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="fixed another stupid thing">
+      <created>1464874019470</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1464874019470</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -556,7 +563,8 @@
     <MESSAGE value="redid plugin.yml" />
     <MESSAGE value="fixed some little thing" />
     <MESSAGE value="fixed another little thing" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed another little thing" />
+    <MESSAGE value="fixed another stupid thing" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed another stupid thing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -682,8 +690,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/plugin.yml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="17" column="50" selection-start-line="17" selection-start-column="50" selection-end-line="17" selection-end-column="50" />
+        <state relative-caret-position="240">
+          <caret line="16" column="12" selection-start-line="16" selection-start-column="12" selection-end-line="16" selection-end-column="12" />
           <folding />
         </state>
       </provider>
