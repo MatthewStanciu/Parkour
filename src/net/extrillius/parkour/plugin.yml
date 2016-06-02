@@ -1,8 +1,8 @@
-name: ExtrilliusParkour
+name: Parkour
 author: TechBug2012
-description: The custom parkour plugin for Extrillius
+description: A parkour plugin for Extrillius
 version: 1.0
-main: net.extrillius.parkour.ExtrilliusParkour
+main: net.extrillius.parkour.Parkour
 
 commands:
   startingpoint:

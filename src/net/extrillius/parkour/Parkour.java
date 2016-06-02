@@ -16,7 +16,7 @@ import java.util.ArrayList;
 /*
  * Created by TechBug2012 on 5/27/16.
  */
-public class ExtrilliusParkour extends JavaPlugin implements Listener {
+public class Parkour extends JavaPlugin implements Listener {
 
     /*
     TODO: Add a /add command for people with build licenses.
