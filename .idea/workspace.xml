@@ -28,8 +28,8 @@
       <file leaf-file-name="Parkour.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/Parkour.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="53" column="44" selection-start-line="53" selection-start-column="44" selection-end-line="53" selection-end-column="44" />
+            <state relative-caret-position="2077">
+              <caret line="172" column="29" selection-start-line="172" selection-start-column="29" selection-end-line="172" selection-end-column="29" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -520,7 +520,14 @@
       <option name="project" value="LOCAL" />
       <updated>1464874274621</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="fixed some things that i caught because i'm so good">
+      <created>1464874581178</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1464874581178</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -580,7 +587,8 @@
     <MESSAGE value="fixed another stupid thing" />
     <MESSAGE value="made a typo" />
     <MESSAGE value="added a few comments and fixed somet things" />
-    <option name="LAST_COMMIT_MESSAGE" value="added a few comments and fixed somet things" />
+    <MESSAGE value="fixed some things that i caught because i'm so good" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed some things that i caught because i'm so good" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -704,8 +712,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/Parkour.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="53" column="44" selection-start-line="53" selection-start-column="44" selection-end-line="53" selection-end-column="44" />
+        <state relative-caret-position="2077">
+          <caret line="172" column="29" selection-start-line="172" selection-start-column="29" selection-end-line="172" selection-end-column="29" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

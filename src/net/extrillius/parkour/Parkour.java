@@ -27,7 +27,7 @@ public class Parkour extends JavaPlugin implements Listener {
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
 
-        // unsure whether or not to add defaults. will skip for now
+        this.saveDefaultConfig();
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -49,7 +49,12 @@ public class Parkour extends JavaPlugin implements Listener {
                 return false;
             }
             else {
+                if (getConfig().contains("maps." + args[0])) {
+                    p.sendMessage(ChatColor.RED + "That map already exists. Try a different name.");
+                    return false;
+                }
                 getConfig().set("maps." + args[0], "");
+                saveConfig();
                 p.sendMessage(ChatColor.AQUA + "Map " + ChatColor.GREEN + ChatColor.BOLD + args[0] + ChatColor.AQUA +
                         " has been added.");
                 p.sendMessage(ChatColor.AQUA + "Stand where you want your starting point to be and type " +
@@ -76,6 +81,7 @@ public class Parkour extends JavaPlugin implements Listener {
                 getConfig().set("maps." + args[0] + ".startpoint.Z", location.getZ());
                 getConfig().set("maps." + args[0] + ".startpoint.YAW", location.getYaw());
                 getConfig().set("maps." + args[0] + ".startpoint.PITCH", location.getPitch());
+                saveConfig();
                 p.sendMessage(ChatColor.AQUA + "Starting point for map " + ChatColor.GREEN + args[0] +
                         ChatColor.AQUA + " set!");
                 p.sendMessage(ChatColor.AQUA + "Stand where you want your checkpoints to be and type " +
@@ -108,6 +114,7 @@ public class Parkour extends JavaPlugin implements Listener {
                 getConfig().set("maps." + args[0] + ".checkpoint." + value + ".Z", location.getZ());
                 getConfig().set("maps." + args[0] + ".checkpoint." + value + ".YAW", location.getYaw());
                 getConfig().set("maps." + args[0] + ".checkpoint." + value + ".PITCH", location.getPitch());
+                saveConfig();
                 p.sendMessage(ChatColor.AQUA + "Checkpoint " + ChatColor.GREEN + value +
                         ChatColor.AQUA + " set.");
                 p.sendMessage(ChatColor.AQUA + "After you finish setting your checkpoints, type " +
@@ -134,6 +141,7 @@ public class Parkour extends JavaPlugin implements Listener {
                 getConfig().set("maps." + args[0] + ".endpoint.Z", location.getZ());
                 getConfig().set("maps." + args[0] + ".endpoint.YAW", location.getYaw());
                 getConfig().set("maps." + args[0] + ".endpoint.PITCH", location.getPitch());
+                saveConfig();
                 p.sendMessage(ChatColor.AQUA + "Ending point for map " + ChatColor.GREEN + args[0] +
                         ChatColor.AQUA + " has been set!");
                 p.sendMessage(ChatColor.AQUA + "Now, set your death blocks.");
@@ -144,7 +152,7 @@ public class Parkour extends JavaPlugin implements Listener {
         }
         if (cmd.getName().equalsIgnoreCase("deathblock")) {
             if (args.length != 2) {
-                p.sendMessage(ChatColor.GRAY + "Usage: " + ChatColor.AQUA + "/deathblock <value> <map>");
+                p.sendMessage(ChatColor.GRAY + "Usage: " + ChatColor.AQUA + "/deathblock <map> <value>");
                 return false;
             }
             else if (!(p.hasPermission("parkour.admin")) || !(p.hasPermission("parkour.build"))) {
@@ -162,8 +170,10 @@ public class Parkour extends JavaPlugin implements Listener {
                         ChatColor.GREEN + "/finish <map>");
                 deathBlocks.add(deathBlock);
                 getConfig().set("maps." + args[0] + ".deathblocks", deathBlocks);
+                saveConfig();
                 p.sendMessage(ChatColor.AQUA + "Death block " +
-                        ChatColor.GREEN + deathBlock.toString() + ChatColor.AQUA + " has been added.");
+                        ChatColor.GREEN + deathBlock.getType().toString().toLowerCase() +
+                        ChatColor.AQUA + " has been added.");
             }
         }
         if (cmd.getName().equalsIgnoreCase("finish")) {
@@ -205,8 +215,8 @@ public class Parkour extends JavaPlugin implements Listener {
                             ChatColor.AQUA + " has been created!");
                     if (p.hasPermission("parkour.build")) {
                         p.sendMessage(ChatColor.AQUA + "If you'd like to add anyone to your map, type " +
-                                ChatColor.GREEN + "/add <name> <map>");
-                        p.sendMessage(ChatColor.AQUA + "Happy parkouring!");
+                                ChatColor.GREEN + "/add <map> <name>");
+                        p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Happy parkouring!");
                     }
                 }
             }
