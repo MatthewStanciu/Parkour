@@ -20,6 +20,7 @@ public class Parkour extends JavaPlugin implements Listener {
 
     /*
     TODO: Add a /add command for people with build licenses.
+    TODO: an addDefault option must exist, I guess...
     */
     private ArrayList<Block> deathBlocks = new ArrayList<>();
 
@@ -161,7 +162,7 @@ public class Parkour extends JavaPlugin implements Listener {
                 deathBlocks.add(deathBlock);
                 getConfig().set("maps." + args[0] + ".deathblocks", deathBlocks);
                 p.sendMessage(ChatColor.AQUA + "Death block " +
-                        ChatColor.GREEN + deathBlock + ChatColor.AQUA + " has been added.");
+                        ChatColor.GREEN + deathBlock.toString() + ChatColor.AQUA + " has been added.");
             }
         }
         if (cmd.getName().equalsIgnoreCase("finish")) {
@@ -179,7 +180,7 @@ public class Parkour extends JavaPlugin implements Listener {
                 return false;
             }
             else {
-                if (!(getConfig().contains("maps." + args[0]))) {
+                if (!(getConfig().contains("maps." + args[0]))) { // this produces an error ingame. why?
                     p.sendMessage(ChatColor.RED + "The map " + ChatColor.AQUA + args[0] +
                             ChatColor.RED +
                             " does not exist in the config. " +
