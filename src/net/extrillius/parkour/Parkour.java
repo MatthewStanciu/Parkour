@@ -50,7 +50,8 @@ public class Parkour extends JavaPlugin implements Listener {
             }
             else {
                 getConfig().set("maps." + args[0], "");
-                p.sendMessage(ChatColor.AQUA + "Map " + ChatColor.BOLD + args[0] + ChatColor.AQUA + " has been added.");
+                p.sendMessage(ChatColor.AQUA + "Map " + ChatColor.GREEN + ChatColor.BOLD + args[0] + ChatColor.AQUA +
+                        " has been added.");
                 p.sendMessage(ChatColor.AQUA + "Stand where you want your starting point to be and type " +
                         ChatColor.GREEN + "/startpoint <name>");
             }
@@ -78,7 +79,7 @@ public class Parkour extends JavaPlugin implements Listener {
                 p.sendMessage(ChatColor.AQUA + "Starting point for map " + ChatColor.GREEN + args[0] +
                         ChatColor.AQUA + " set!");
                 p.sendMessage(ChatColor.AQUA + "Stand where you want your checkpoints to be and type " +
-                        ChatColor.GREEN + "/checkpoint <value> <map>");
+                        ChatColor.GREEN + "/checkpoint <map> <value>");
             }
         }
         if (cmd.getName().equalsIgnoreCase("checkpoint")) {
