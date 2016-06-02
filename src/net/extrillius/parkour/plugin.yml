@@ -5,7 +5,9 @@ version: 1.0
 main: net.extrillius.parkour.Parkour
 
 commands:
-  startingpoint:
+  create:
+    description: Being creating a map
+  startpoint:
     description: Set the starting point for a created map.
   checkpoint:
     description: Set the checkpoints for a created map.
