@@ -12,7 +12,7 @@ commands:
   checkpoint:
     description: Set the checkpoints for a created map.
     aliases: cp
-  finishpoint:
+  endpoint:
     description: Set the finish point for a created map.
   finish:
     description: Check to see if your created map is finished.

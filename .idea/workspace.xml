@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e8224487-07fc-4fe4-a218-6563d462027c" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/Parkour_jar.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/Parkour_jar.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Parkour.iml" afterPath="$PROJECT_DIR$/Parkour.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/net/extrillius/parkour/plugin.yml" afterPath="$PROJECT_DIR$/src/net/extrillius/parkour/plugin.yml" />
     </list>
     <ignored path="Parkour.iws" />
@@ -42,8 +40,8 @@
       <file leaf-file-name="plugin.yml" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/plugin.yml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="8" column="37" selection-start-line="8" selection-start-column="37" selection-end-line="8" selection-end-column="37" />
+            <state relative-caret-position="210">
+              <caret line="14" column="10" selection-start-line="14" selection-start-column="10" selection-end-line="14" selection-end-column="10" />
               <folding />
             </state>
           </provider>
@@ -487,7 +485,14 @@
       <option name="project" value="LOCAL" />
       <updated>1464873391711</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="fixed some little thing">
+      <created>1464873857362</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1464873857362</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -542,7 +547,8 @@
     <MESSAGE value="added config.yml&#10;" />
     <MESSAGE value="changed the name of class" />
     <MESSAGE value="redid plugin.yml" />
-    <option name="LAST_COMMIT_MESSAGE" value="redid plugin.yml" />
+    <MESSAGE value="fixed some little thing" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed some little thing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -668,8 +674,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/plugin.yml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="37" selection-start-line="8" selection-start-column="37" selection-end-line="8" selection-end-column="37" />
+        <state relative-caret-position="210">
+          <caret line="14" column="10" selection-start-line="14" selection-start-column="10" selection-end-line="14" selection-end-column="10" />
           <folding />
         </state>
       </provider>
