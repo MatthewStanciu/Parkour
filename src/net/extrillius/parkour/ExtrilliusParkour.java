@@ -94,7 +94,7 @@ public class ExtrilliusParkour extends JavaPlugin implements Listener {
                 }
                 return false;
             }
-            else if (!StringUtils.isNumeric(args[0])) {
+            else if (!StringUtils.isNumeric(args[1])) {
                 p.sendMessage(ChatColor.RED + "Your second argument must be an integer!");
                 p.sendMessage(ChatColor.GRAY + "Usage: " + ChatColor.AQUA + "/checkpoint <map> <value>");
                 return false;
@@ -194,7 +194,7 @@ public class ExtrilliusParkour extends JavaPlugin implements Listener {
                 }
                 else if (!(getConfig().contains("maps." + args[0] + ".deathblocks"))) {
                     p.sendMessage(ChatColor.RED + "The map " + ChatColor.AQUA + args[0] + ChatColor.RED +
-                            "Does not have any death blocks set!");
+                            " does not have any death blocks set!");
                     p.sendMessage(ChatColor.RED + "Run the /deathblock command again, then run this command again.");
                     return false;
                 }
