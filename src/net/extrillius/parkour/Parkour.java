@@ -9,14 +9,15 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /*
  * Created by TechBug2012 on 5/27/16.
@@ -28,9 +29,8 @@ public class Parkour extends JavaPlugin implements Listener {
     TODO: Find a way to get the map name and make an onJoin method that handles everything that happens in a map,
     TODO: ...including the player boolean
     */
-    private ArrayList<Material> deathBlocks = new ArrayList<>();
     private Set<String> joinedPlayers = new HashSet<>();
-
+    private HashMap<String, String> playerMap = new HashMap<>();
 
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
@@ -38,7 +38,7 @@ public class Parkour extends JavaPlugin implements Listener {
         this.saveDefaultConfig();
     }
 
-    public void setMapInv(Player p) {
+    private void setMapInv(Player p) {
         ItemStack deathArrow = new ItemStack(Material.ARROW, 1);
         ItemMeta arrowMeta = deathArrow.getItemMeta();
         arrowMeta.setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "Suicide");
@@ -54,7 +54,7 @@ public class Parkour extends JavaPlugin implements Listener {
         stickMeta.setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "Leave the map");
         p.getInventory().setItem(7, leaveStick);
     }
-    public void setLobbyInv(Player p) {
+    private void setLobbyInv(Player p) {
         ItemStack serverCompass = new ItemStack(Material.COMPASS, 1);
         ItemMeta compassMeta = serverCompass.getItemMeta();
         compassMeta.setDisplayName(ChatColor.GOLD + "Server Selector " + ChatColor.GRAY + "(Right click)");
@@ -64,6 +64,19 @@ public class Parkour extends JavaPlugin implements Listener {
         ItemMeta emeraldMeta = shopEmerald.getItemMeta();
         emeraldMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "Server Shop");
         p.getInventory().setItem(5, shopEmerald);
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent event) {
+        Player p = event.getPlayer();
+
+        if (playerMap.containsKey(p.getName())) {
+            //TODO: loop through checkpoint values and check if player is in each one
+            if (p.getLocation().getBlock().getRelative(BlockFace.DOWN) == getConfig().get
+                    ("maps." + playerMap.get(p.getName()) + ".deathblocks")) {
+                //TODO: Teleport the player to each prev. checkpoint or start of map
+            }
+        }
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -182,13 +195,12 @@ public class Parkour extends JavaPlugin implements Listener {
                         ChatColor.AQUA + " has been set!");
                 p.sendMessage(ChatColor.AQUA + "Now, set your death blocks.");
                 p.sendMessage(ChatColor.AQUA + "Stand on one of your death blocks and type "
-                        + ChatColor.GREEN + "/deathblock <map>" +
-                        ChatColor.AQUA + " for each death block you want to add in your map.");
+                        + ChatColor.GREEN + "/deathblock <map>");
             }
         }
         if (cmd.getName().equalsIgnoreCase("deathblock")) {
-            if (args.length != 2) {
-                p.sendMessage(ChatColor.GRAY + "Usage: " + ChatColor.AQUA + "/deathblock <map> <value>");
+            if (args.length != 1) {
+                p.sendMessage(ChatColor.GRAY + "Usage: " + ChatColor.AQUA + "/deathblock <map>");
                 return false;
             }
             else if (!(p.hasPermission("parkour.admin")) || !(p.hasPermission("parkour.build"))) {
@@ -204,8 +216,7 @@ public class Parkour extends JavaPlugin implements Listener {
                 Material deathBlock = location.getBlock().getRelative(BlockFace.DOWN).getType();
                 p.sendMessage(ChatColor.AQUA + "When you are finished, type " +
                         ChatColor.GREEN + "/finish <map>");
-                deathBlocks.add(deathBlock);
-                getConfig().set("maps." + args[0] + ".deathblocks", deathBlocks);
+                getConfig().set("maps." + args[0] + ".deathblocks", deathBlock);
                 saveConfig();
                 p.sendMessage(ChatColor.AQUA + "Death block " +
                         ChatColor.GREEN + deathBlock.toString().toLowerCase() +
@@ -280,6 +291,7 @@ public class Parkour extends JavaPlugin implements Listener {
                 }
                 else {
                     joinedPlayers.add(p.getName());
+                    playerMap.put(p.getName(), args[0]);
                     p.teleport(mapStart);
                     p.getInventory().clear();
                     setMapInv(p);
