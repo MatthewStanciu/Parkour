@@ -12,13 +12,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /*
  * Created by TechBug2012 on 5/27/16.
@@ -27,10 +33,12 @@ public class Parkour extends JavaPlugin implements Listener {
 
     /*
     TODO: Add a /add command for people with build licenses.
+    TODO: Fix the checkpoint + endpoint detecion and death counter
     */
     private Set<String> joinedPlayers = new HashSet<>();
+    private Set<String> hiddenPlayers = new HashSet<>();
     private HashMap<String, String> playerMap = new HashMap<>();
-    private HashMap<String, Integer> playerCheckpoint = new HashMap<>();
+    private HashMap<String, String> playerCheckpoint = new HashMap<>();
     private HashMap<String, Integer> deathCount = new HashMap<>();
 
     public void onEnable() {
@@ -38,60 +46,68 @@ public class Parkour extends JavaPlugin implements Listener {
 
         this.saveDefaultConfig();
     }
+
     //Items players use within maps
     private void setMapInv(Player p) {
         ItemStack deathArrow = new ItemStack(Material.ARROW, 1);
         ItemMeta arrowMeta = deathArrow.getItemMeta();
         arrowMeta.setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "Suicide");
-        p.getInventory().setItem(2, deathArrow);
+        deathArrow.setItemMeta(arrowMeta);
+        p.getInventory().setItem(1, deathArrow);
 
         ItemStack visBall = new ItemStack(Material.SLIME_BALL, 1);
         ItemMeta ballMeta = visBall.getItemMeta();
-        ballMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "Players are visible");
-        p.getInventory().setItem(5, visBall);
+        ballMeta.setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "Toggle player visibility");
+        visBall.setItemMeta(ballMeta);
+        p.getInventory().setItem(4, visBall);
 
         ItemStack leaveStick = new ItemStack(Material.STICK, 1);
         ItemMeta stickMeta = leaveStick.getItemMeta();
         stickMeta.setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "Leave the map");
-        p.getInventory().setItem(7, leaveStick);
+        leaveStick.setItemMeta(stickMeta);
+        p.getInventory().setItem(6, leaveStick);
     }
+
     //Items players use within lobby
     private void setLobbyInv(Player p) {
         ItemStack serverCompass = new ItemStack(Material.COMPASS, 1);
         ItemMeta compassMeta = serverCompass.getItemMeta();
         compassMeta.setDisplayName(ChatColor.GOLD + "Server Selector " + ChatColor.GRAY + "(Right click)");
-        p.getInventory().setItem(2, serverCompass);
+        serverCompass.setItemMeta(compassMeta);
+        p.getInventory().setItem(1, serverCompass);
 
         ItemStack shopEmerald = new ItemStack(Material.EMERALD, 1);
         ItemMeta emeraldMeta = shopEmerald.getItemMeta();
-        emeraldMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "Server Shop");
-        p.getInventory().setItem(5, shopEmerald);
+        emeraldMeta.setDisplayName(ChatColor.GREEN + "Server Shop");
+        shopEmerald.setItemMeta(emeraldMeta);
+        p.getInventory().setItem(4, shopEmerald);
     }
+
     //Death counter (broken)
     private void killPlayer(Player p) {
         int death = 0;
         death++;
-        if (deathCount.containsKey(p.getName())) {
-            deathCount.remove(p.getName());
-        }
         deathCount.put(p.getName(), death);
 
         if (deathCount.get(p.getName()) == 1) {
             p.sendMessage(ChatColor.AQUA + "You have " + ChatColor.GREEN + "" + ChatColor.BOLD + "1 " +
                     ChatColor.AQUA + "death.");
-        }
-        else {
+        } else {
             p.sendMessage(ChatColor.AQUA + "You have " + ChatColor.GREEN + "" + ChatColor.BOLD
-                    + deathCount.get(p.getName()));
+                    + deathCount.get(p.getName()) + " deaths.");
         }
     }
+
     //Lobby teleport command
     private void leaveMap(Player p) {
         p.performCommand("spawn");
+        p.sendMessage(ChatColor.AQUA + "You left the map " + ChatColor.GREEN + "" + ChatColor.BOLD +
+                playerMap.get(p.getName()));
         playerCheckpoint.remove(p.getName());
         playerMap.remove(p.getName());
         deathCount.remove(p.getName());
         joinedPlayers.remove(p.getName());
+        p.getInventory().clear();
         setLobbyInv(p);
     }
 
@@ -100,27 +116,35 @@ public class Parkour extends JavaPlugin implements Listener {
     public void onMove(PlayerMoveEvent event) {
         Player p = event.getPlayer();
 
+        if (joinedPlayers.contains(p.getName())) {
+            if (p.getHealth() != 20) {
+                p.setHealth(20);
+            }
+            if (p.getSaturation() != 20) {
+                p.setSaturation(20);
+            }
+        }
+
         if (playerMap.containsKey(p.getName())) {
+            String checkpoint = getConfig().getString("maps." + playerMap.get(p.getName()) +
+                    ".checkpoint");
             for (String key : getConfig().getConfigurationSection("maps." + playerMap.get(p.getName()) +
-                    ".checkpoint").getKeys(true)) { // key is never used... problems in the future?
-                int checkpoint = Integer.parseInt(getConfig().getString("maps." + playerMap.get(p.getName()) +
-                        ".checkpoint"));
-                if (p.getLocation().getX() == getConfig().getDouble("maps." + playerMap.get(p.getName()) +
-                        ".checkpoint." + checkpoint + ".X")) {
-                    if (p.getLocation().getY() == getConfig().getDouble("maps." + playerMap.get(p.getName()) +
-                            ".checkpoint." + checkpoint + ".Y")) {
-                        if (p.getLocation().getZ() == getConfig().getDouble("maps." + playerMap.get(p.getName()) +
-                                ".checkpoint." + checkpoint + ".Z")) {
+                    ".checkpoint").getKeys(false)) { // Does not work; changed to false, maybe it will work?
+                if (p.getLocation().getX() == getConfig().getDouble(key + ".X")) {
+                    if (p.getLocation().getY() == getConfig().getDouble("maps." + playerMap.get(key + ".Y"))) {
+                        if (p.getLocation().getZ() == getConfig().getDouble(key + ".Z")) {
                             if (!(playerCheckpoint.isEmpty())) {
                                 playerCheckpoint.clear();
                             }
                             playerCheckpoint.put(p.getName(), checkpoint);
+                            p.sendMessage(ChatColor.AQUA + "You have reached checkpoint " + ChatColor.GREEN +
+                                    ChatColor.BOLD + checkpoint);
                         }
                     }
                 }
             }
-            if (p.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == getConfig().get
-                    ("maps." + playerMap.get(p.getName()) + ".deathblocks.type")) {
+            if (p.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().toString().equals(getConfig()
+                    .getString("maps." + playerMap.get(p.getName()) + ".deathblocks"))) {
                 Location cp = new Location(p.getWorld(), getConfig().getDouble("maps." + playerMap.get(p.getName()) +
                         ".checkpoint." + playerCheckpoint.get(p.getName()) + ".X"), getConfig().getDouble("maps." +
                         playerMap.get(p.getName()) +
@@ -132,20 +156,19 @@ public class Parkour extends JavaPlugin implements Listener {
                         playerMap.get(p.getName()) +
                         ".checkpoint." + playerCheckpoint.get(p.getName()) + ".PITCH"));
                 Location start = new Location(p.getWorld(), getConfig().getDouble("maps." + playerMap.get(p.getName()) +
-                        ".startingpoint.X"), getConfig().getDouble("maps." + playerMap.get(p.getName()) +
-                        ".startingpoint.Y"), getConfig().getDouble("maps." + playerMap.get(p.getName()) +
-                        ".startingpoint.Z"), getConfig().getInt("maps." + playerMap.get(p.getName()) +
-                        ".startingpoint.YAW"), getConfig().getInt("maps." + playerMap.get(p.getName()) +
-                        ".startingpoint.PITCH"));
+                        ".startpoint.X"), getConfig().getDouble("maps." + playerMap.get(p.getName()) +
+                        ".startpoint.Y"), getConfig().getDouble("maps." + playerMap.get(p.getName()) +
+                        ".startpoint.Z"), getConfig().getInt("maps." + playerMap.get(p.getName()) +
+                        ".startpoint.YAW"), getConfig().getInt("maps." + playerMap.get(p.getName()) +
+                        ".startpoint.PITCH"));
 
                 if (playerCheckpoint.containsKey(p.getName())) {
-                    p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "You died!" + ChatColor.AQUA +
+                    p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "You died! " + ChatColor.AQUA +
                             "Teleporting you to checkpoint " + ChatColor.GREEN +
                             "" + ChatColor.BOLD + playerCheckpoint.get(p.getName()));
                     p.teleport(cp);
-                }
-                else {
-                    p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "You died!" + ChatColor.AQUA +
+                } else {
+                    p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "You died! " + ChatColor.AQUA +
                             "Teleporting you to the start of the map.");
                     p.teleport(start);
                 }
@@ -153,56 +176,76 @@ public class Parkour extends JavaPlugin implements Listener {
             }
         }
     }
+
     @SuppressWarnings("unused")
     //using items within maps
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         Player p = event.getPlayer();
-        ItemStack deathArrow = new ItemStack(Material.ARROW, 1);
-        ItemMeta arrowMeta = deathArrow.getItemMeta();
-        arrowMeta.setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "Suicide");
 
-        ItemStack visBall = new ItemStack(Material.SLIME_BALL, 1);
-        ItemMeta ballMeta = visBall.getItemMeta();
-        ballMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "Players are visible");
-
-        ItemStack leaveStick = new ItemStack(Material.STICK, 1);
-        ItemMeta stickMeta = leaveStick.getItemMeta();
-        stickMeta.setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "Leave the map");
-
-        if (event.getAction() == Action.RIGHT_CLICK_AIR) {
+        if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             if (joinedPlayers.contains(p.getName())) {
-                if (p.getInventory().contains(deathArrow)) {
-                    if (p.getItemInHand() == deathArrow) {
-                        killPlayer(p);
-                    }
-                    if (p.getItemInHand() == visBall) {
-                        if (ballMeta.getDisplayName().equals(ChatColor.GREEN + "" + ChatColor.BOLD +
-                                "Players are visible")) {
-                            for (Player o : getServer().getOnlinePlayers()) {
-                                if (joinedPlayers.contains(o.getName())) {
-                                    p.hidePlayer(o);
-                                    ballMeta.setDisplayName(ChatColor.RED + "" + ChatColor.BOLD +
-                                            "Players are invisible");
-                                }
-                            }
-                        }
-                        if (ballMeta.getDisplayName().equals(ChatColor.RED + "" + ChatColor.BOLD +
-                                "Players are invisible")) {
-                            for (Player o : getServer().getOnlinePlayers()) {
-                                p.showPlayer(o);
-                                ballMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD +
-                                        "Players are visible");
-                            }
+                if (p.getItemInHand().getType() == Material.ARROW) {
+                    killPlayer(p);
+                }
+                if (p.getItemInHand().getType() == Material.SLIME_BALL) {
+                    for (Player o : getServer().getOnlinePlayers()) {
+                        if (!(hiddenPlayers.contains(p.getName()))) {
+                            hiddenPlayers.add(p.getName());
+                            p.hidePlayer(o);
+                            p.sendMessage(ChatColor.AQUA + "Players are now invisible.");
+                        } else {
+                            hiddenPlayers.remove(p.getName());
+                            p.showPlayer(o);
+                            p.sendMessage(ChatColor.AQUA + "Players are now visible again.");
                         }
                     }
-                    if (p.getItemInHand() == leaveStick) {
-                        leaveMap(p);
-                    }
+                }
+                if (p.getItemInHand().getType() == Material.STICK) {
+                    leaveMap(p);
                 }
             }
         }
     }
+
+    @SuppressWarnings("unused")
+    @EventHandler
+    public void onPlayerLeave(PlayerQuitEvent event) {
+        Player p = event.getPlayer();
+        if (joinedPlayers.contains(p.getName())) {
+            leaveMap(p);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        Player p = event.getPlayer();
+        if (joinedPlayers.contains(p.getName())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    @EventHandler
+    public void onBlockPlace(BlockPlaceEvent event) {
+        Player p = event.getPlayer();
+        if (joinedPlayers.contains(p.getName())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    @EventHandler
+    public void onDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player p = (Player) event.getEntity();
+            if (joinedPlayers.contains(p.getName())) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         Player p = (Player) sender;
@@ -212,8 +255,7 @@ public class Parkour extends JavaPlugin implements Listener {
             if (args.length != 1) {
                 p.sendMessage(ChatColor.GRAY + "Usage: " + ChatColor.AQUA + "/create <name>");
                 return false;
-            }
-            else if (!(p.hasPermission("parkour.admin")) || !(p.hasPermission("parkour.build"))) {
+            } else if (!(p.hasPermission("parkour.admin")) || !(p.hasPermission("parkour.build"))) {
                 p.sendMessage(ChatColor.RED + "You don't have permission to create maps!");
                 if (!(p.hasPermission("parkour.build")) && !(p.hasPermission("parkour.admin"))) {
                     p.sendMessage(ChatColor.AQUA + "You can purchase a build license from the " +
@@ -221,8 +263,7 @@ public class Parkour extends JavaPlugin implements Listener {
                             + ChatColor.GREEN + "Buycraft store" + ChatColor.AQUA + ".");
                 }
                 return false;
-            }
-            else {
+            } else {
                 if (getConfig().contains("maps." + args[0])) {
                     p.sendMessage(ChatColor.RED + "That map already exists. Try a different name.");
                     return false;
@@ -239,8 +280,7 @@ public class Parkour extends JavaPlugin implements Listener {
             if (args.length != 1) {
                 p.sendMessage(ChatColor.GRAY + "Usage: " + ChatColor.AQUA + "/startpoint <name>");
                 return false;
-            }
-            else if (!(p.hasPermission("parkour.admin")) || !(p.hasPermission("parkour.build"))) {
+            } else if (!(p.hasPermission("parkour.admin")) || !(p.hasPermission("parkour.build"))) {
                 p.sendMessage(ChatColor.RED + "You don't have permission to create maps!");
                 if (!(p.hasPermission("parkour.build")) && !(p.hasPermission("parkour.admin"))) {
                     p.sendMessage(ChatColor.AQUA + "You can purchase a build license from the " +
@@ -248,8 +288,7 @@ public class Parkour extends JavaPlugin implements Listener {
                             + ChatColor.GREEN + "Buycraft store" + ChatColor.AQUA + ".");
                 }
                 return false;
-            }
-            else {
+            } else {
                 getConfig().set("maps." + args[0] + ".startpoint.X", location.getX());
                 getConfig().set("maps." + args[0] + ".startpoint.Y", location.getY());
                 getConfig().set("maps." + args[0] + ".startpoint.Z", location.getZ());
@@ -266,8 +305,7 @@ public class Parkour extends JavaPlugin implements Listener {
             if (args.length != 2) {
                 p.sendMessage(ChatColor.GRAY + "Usage: " + ChatColor.AQUA + "/checkpoint <map> <value>");
                 return false;
-            }
-            else if (!(p.hasPermission("parkour.admin")) || !(p.hasPermission("parkour.build"))) {
+            } else if (!(p.hasPermission("parkour.admin")) || !(p.hasPermission("parkour.build"))) {
                 p.sendMessage(ChatColor.RED + "You don't have permission to create maps!");
                 if (!(p.hasPermission("parkour.build")) && !(p.hasPermission("parkour.admin"))) {
                     p.sendMessage(ChatColor.AQUA + "You can purchase a build license from the " +
@@ -275,13 +313,11 @@ public class Parkour extends JavaPlugin implements Listener {
                             + ChatColor.GREEN + "Buycraft store" + ChatColor.AQUA + ".");
                 }
                 return false;
-            }
-            else if (!StringUtils.isNumeric(args[1])) {
+            } else if (!StringUtils.isNumeric(args[1])) {
                 p.sendMessage(ChatColor.RED + "Your second argument must be an integer!");
                 p.sendMessage(ChatColor.GRAY + "Usage: " + ChatColor.AQUA + "/checkpoint <map> <value>");
                 return false;
-            }
-            else {
+            } else {
                 int value = Integer.parseInt(args[1]);
                 getConfig().set("maps." + args[0] + ".checkpoint." + value + ".X", location.getX());
                 getConfig().set("maps." + args[0] + ".checkpoint." + value + ".Y", location.getY());
@@ -299,8 +335,7 @@ public class Parkour extends JavaPlugin implements Listener {
             if (args.length != 1) {
                 p.sendMessage(ChatColor.GRAY + "Usage: " + ChatColor.AQUA + "/endpoint <map>");
                 return false;
-            }
-            else if (!(p.hasPermission("parkour.admin")) || !(p.hasPermission("parkour.build"))) {
+            } else if (!(p.hasPermission("parkour.admin")) || !(p.hasPermission("parkour.build"))) {
                 p.sendMessage(ChatColor.RED + "You don't have permission to create maps!");
                 if (!(p.hasPermission("parkour.build")) && !(p.hasPermission("parkour.admin"))) {
                     p.sendMessage(ChatColor.AQUA + "You can purchase a build license from the " +
@@ -308,8 +343,7 @@ public class Parkour extends JavaPlugin implements Listener {
                             + ChatColor.GREEN + "Buycraft store" + ChatColor.AQUA + ".");
                 }
                 return false;
-            }
-            else {
+            } else {
                 getConfig().set("maps." + args[0] + ".endpoint.X", location.getX());
                 getConfig().set("maps." + args[0] + ".endpoint.Y", location.getY());
                 getConfig().set("maps." + args[0] + ".endpoint.Z", location.getZ());
@@ -327,8 +361,7 @@ public class Parkour extends JavaPlugin implements Listener {
             if (args.length != 1) {
                 p.sendMessage(ChatColor.GRAY + "Usage: " + ChatColor.AQUA + "/deathblock <map>");
                 return false;
-            }
-            else if (!(p.hasPermission("parkour.admin")) || !(p.hasPermission("parkour.build"))) {
+            } else if (!(p.hasPermission("parkour.admin")) || !(p.hasPermission("parkour.build"))) {
                 p.sendMessage(ChatColor.RED + "You don't have permission to create maps!");
                 if (!(p.hasPermission("parkour.build")) && !(p.hasPermission("parkour.admin"))) {
                     p.sendMessage(ChatColor.AQUA + "You can purchase a build license from the " +
@@ -336,15 +369,14 @@ public class Parkour extends JavaPlugin implements Listener {
                             + ChatColor.GREEN + "Buycraft store" + ChatColor.AQUA + ".");
                 }
                 return false;
-            }
-            else {
-                Material deathBlock = location.getBlock().getRelative(BlockFace.DOWN).getType();
+            } else {
+                String deathBlock = location.getBlock().getRelative(BlockFace.DOWN).getType().toString();
                 p.sendMessage(ChatColor.AQUA + "When you are finished, type " +
                         ChatColor.GREEN + "/finish <map>");
                 getConfig().set("maps." + args[0] + ".deathblocks", deathBlock);
                 saveConfig();
                 p.sendMessage(ChatColor.AQUA + "Death block " +
-                        ChatColor.GREEN + deathBlock.toString().toLowerCase() +
+                        ChatColor.GREEN + deathBlock.toLowerCase() +
                         ChatColor.AQUA + " has been added.");
             }
         }
@@ -352,8 +384,7 @@ public class Parkour extends JavaPlugin implements Listener {
             if (args.length != 1) {
                 p.sendMessage(ChatColor.GRAY + "Usage: " + ChatColor.AQUA + "/finish <map>");
                 return false;
-            }
-            else if (!(p.hasPermission("parkour.admin")) || !(p.hasPermission("parkour.build"))) {
+            } else if (!(p.hasPermission("parkour.admin")) || !(p.hasPermission("parkour.build"))) {
                 p.sendMessage(ChatColor.RED + "You don't have permission to create maps!");
                 if (!(p.hasPermission("parkour.build")) && !(p.hasPermission("parkour.admin"))) {
                     p.sendMessage(ChatColor.AQUA + "You can purchase a build license from the " +
@@ -361,28 +392,24 @@ public class Parkour extends JavaPlugin implements Listener {
                             + ChatColor.GREEN + "Buycraft store" + ChatColor.AQUA + ".");
                 }
                 return false;
-            }
-            else {
+            } else {
                 if (!(getConfig().contains("maps." + args[0]))) {
                     p.sendMessage(ChatColor.RED + "The map " + ChatColor.AQUA + args[0] +
                             ChatColor.RED +
                             " does not exist in the config. " +
                             "Try spelling it differently, then running this command again.");
                     return false;
-                }
-                else if (!(getConfig().contains("maps." + args[0] + ".endpoint"))) {
+                } else if (!(getConfig().contains("maps." + args[0] + ".endpoint"))) {
                     p.sendMessage(ChatColor.RED + "The map " + ChatColor.AQUA + args[0] + ChatColor.RED +
                             "Does not have an endpoint set!");
                     p.sendMessage(ChatColor.RED + "Run the /endpoint command again, then run this command again.");
                     return false;
-                }
-                else if (!(getConfig().contains("maps." + args[0] + ".deathblocks"))) {
+                } else if (!(getConfig().contains("maps." + args[0] + ".deathblocks"))) {
                     p.sendMessage(ChatColor.RED + "The map " + ChatColor.AQUA + args[0] + ChatColor.RED +
                             " does not have any death blocks set!");
                     p.sendMessage(ChatColor.RED + "Run the /deathblock command again, then run this command again.");
                     return false;
-                }
-                else {
+                } else {
                     p.sendMessage(ChatColor.AQUA + "The map " + ChatColor.GREEN + args[0] +
                             ChatColor.AQUA + " has been created!");
                     if (p.hasPermission("parkour.build")) {
@@ -395,6 +422,14 @@ public class Parkour extends JavaPlugin implements Listener {
         }
         //join maps
         if (cmd.getName().equalsIgnoreCase("join")) {
+            if (args.length == 0) {
+                p.sendMessage(ChatColor.AQUA + "You must specify a map to join.");
+                p.sendMessage(ChatColor.AQUA + "If you are unsure, there are some great maps at spawn!");
+                return false;
+            } else if (args.length > 1) {
+                p.sendMessage(ChatColor.RED + "Usage: " + ChatColor.GRAY + "/join <map>");
+                return false;
+            }
             World world = p.getWorld();
             double startX = getConfig().getDouble("maps." + args[0] + ".startpoint.X");
             double startY = getConfig().getDouble("maps." + args[0] + ".startpoint.Y");
@@ -402,34 +437,34 @@ public class Parkour extends JavaPlugin implements Listener {
             float startYaw = getConfig().getInt("maps." + args[0] + ".startpoint.YAW");
             float startPitch = getConfig().getInt("maps." + args[0] + ".startpoint.PITCH");
             Location mapStart = new Location(world, startX, startY, startZ, startYaw, startPitch);
-            if (args.length != 1) {
-                p.sendMessage(ChatColor.AQUA + "You must specify a map to join.");
-                p.sendMessage(ChatColor.AQUA + "If you are unsure, there are some great maps at spawn!");
+
+            if (!(getConfig().contains("maps." + args[0]))) {
+                p.sendMessage(ChatColor.RED + "That map does not exist!");
+                p.sendMessage(ChatColor.AQUA + "Try spelling it differently; also note that map are " +
+                        "case-sensitive.");
                 return false;
-            }
-            else {
-                if (!(getConfig().contains("maps." + args[0]))) {
-                    p.sendMessage(ChatColor.RED + "That map does not exist!");
-                    p.sendMessage(ChatColor.AQUA + "Try spelling it differently; also note that map names must be " +
-                            "case-sensitive.");
-                    return false;
+            } else {
+                if (!(joinedPlayers.contains(p.getName()))) {
+                    joinedPlayers.add(p.getName());
                 }
-                else {
-                    if (!(joinedPlayers.contains(p.getName()))) {
-                        joinedPlayers.add(p.getName());
-                    }
-                    playerMap.put(p.getName(), args[0]);
-                    p.teleport(mapStart);
-                    p.getInventory().clear();
-                    setMapInv(p);
-                }
+                playerMap.put(p.getName(), args[0]);
+                p.teleport(mapStart);
+                p.getInventory().clear();
+                setMapInv(p);
+                p.sendMessage(ChatColor.AQUA + "You joined the map " + ChatColor.GREEN + "" + ChatColor.BOLD +
+                        playerMap.get(p.getName()));
             }
         }
-        if (cmd.getName().equalsIgnoreCase("leave") || cmd.getName().equalsIgnoreCase("quit") ||
-                cmd.getName().equalsIgnoreCase("lobby")) {
-            p.sendMessage(ChatColor.AQUA + "You left the map " + ChatColor.GREEN + "" + ChatColor.BOLD +
-                    playerMap.get(p.getName()));
-            leaveMap(p);
+        if (cmd.getName().equalsIgnoreCase("leave")) {
+            if (args.length != 0) {
+                p.sendMessage(ChatColor.RED + "Usage: " + ChatColor.GRAY + "/leave");
+                return false;
+            }
+            if (joinedPlayers.contains(p.getName())) {
+                leaveMap(p);
+            } else {
+                p.sendMessage(ChatColor.AQUA + "You are not in a map!");
+            }
         }
 
         return true;
