@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e8224487-07fc-4fe4-a218-6563d462027c" name="Default" comment="Fixed a whole lot of things;">
+    <list default="true" id="e8224487-07fc-4fe4-a218-6563d462027c" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/net/extrillius/parkour/Parkour.java" afterPath="$PROJECT_DIR$/src/net/extrillius/parkour/Parkour.java" />
     </list>
@@ -28,8 +28,8 @@
       <file leaf-file-name="Parkour.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/Parkour.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
-              <caret line="35" column="66" selection-start-line="35" selection-start-column="66" selection-end-line="35" selection-end-column="66" />
+            <state relative-caret-position="300">
+              <caret line="113" column="31" selection-start-line="113" selection-start-column="31" selection-end-line="113" selection-end-column="31" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -680,7 +680,14 @@
       <option name="project" value="LOCAL" />
       <updated>1464962999685</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="Fixed a whole lot of things; checkpoint + endpoint detectoin and death counter still broken">
+      <created>1464981795513</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1464981795513</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -747,7 +754,8 @@
     <MESSAGE value="began PlayerMoveEvent; allowed for easy access of maps in config; removed option for multiple death blocks" />
     <MESSAGE value="join/leave and player inventories completed, but untested" />
     <MESSAGE value="added &quot;leave&quot; command" />
-    <option name="LAST_COMMIT_MESSAGE" value="added &quot;leave&quot; command" />
+    <MESSAGE value="Fixed a whole lot of things; checkpoint + endpoint detectoin and death counter still broken" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed a whole lot of things; checkpoint + endpoint detectoin and death counter still broken" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -871,8 +879,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/Parkour.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="35" column="66" selection-start-line="35" selection-start-column="66" selection-end-line="35" selection-end-column="66" />
+        <state relative-caret-position="300">
+          <caret line="113" column="31" selection-start-line="113" selection-start-column="31" selection-end-line="113" selection-end-column="31" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

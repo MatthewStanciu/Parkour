@@ -111,6 +111,7 @@ public class Parkour extends JavaPlugin implements Listener {
         setLobbyInv(p);
     }
 
+    @SuppressWarnings("unused")
     @EventHandler
     //Checkpoints, spawns, deathblocks
     public void onMove(PlayerMoveEvent event) {
