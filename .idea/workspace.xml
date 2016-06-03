@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="e8224487-07fc-4fe4-a218-6563d462027c" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/net/extrillius/parkour/Parkour.java" afterPath="$PROJECT_DIR$/src/net/extrillius/parkour/Parkour.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/net/extrillius/parkour/plugin.yml" afterPath="$PROJECT_DIR$/src/net/extrillius/parkour/plugin.yml" />
     </list>
     <ignored path="Parkour.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -25,11 +25,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Parkour.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Parkour.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/Parkour.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="97">
-              <caret line="93" column="4" selection-start-line="93" selection-start-column="4" selection-end-line="93" selection-end-column="4" />
+            <state relative-caret-position="142">
+              <caret line="96" column="37" selection-start-line="96" selection-start-column="37" selection-end-line="96" selection-end-column="37" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -37,11 +37,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="plugin.yml" pinned="false" current-in-tab="false">
+      <file leaf-file-name="plugin.yml" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/plugin.yml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
-              <caret line="21" column="27" selection-start-line="21" selection-start-column="27" selection-end-line="21" selection-end-column="27" />
+            <state relative-caret-position="345">
+              <caret line="23" column="28" selection-start-line="23" selection-start-column="28" selection-end-line="23" selection-end-column="28" />
               <folding />
             </state>
           </provider>
@@ -78,8 +78,8 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/net/extrillius/parkour/ExtrilliusParkour.java" />
-        <option value="$PROJECT_DIR$/src/net/extrillius/parkour/plugin.yml" />
         <option value="$PROJECT_DIR$/src/net/extrillius/parkour/Parkour.java" />
+        <option value="$PROJECT_DIR$/src/net/extrillius/parkour/plugin.yml" />
       </list>
     </option>
   </component>
@@ -555,7 +555,14 @@
       <option name="project" value="LOCAL" />
       <updated>1464916825073</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="join/leave and player inventories completed, but untested">
+      <created>1464962915396</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1464962915396</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -620,7 +627,8 @@
     <MESSAGE value="Made most of the join aspect" />
     <MESSAGE value="removed unused import" />
     <MESSAGE value="began PlayerMoveEvent; allowed for easy access of maps in config; removed option for multiple death blocks" />
-    <option name="LAST_COMMIT_MESSAGE" value="began PlayerMoveEvent; allowed for easy access of maps in config; removed option for multiple death blocks" />
+    <MESSAGE value="join/leave and player inventories completed, but untested" />
+    <option name="LAST_COMMIT_MESSAGE" value="join/leave and player inventories completed, but untested" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -734,21 +742,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/plugin.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="21" column="27" selection-start-line="21" selection-start-column="27" selection-end-line="21" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/Parkour.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="97">
-          <caret line="93" column="4" selection-start-line="93" selection-start-column="4" selection-end-line="93" selection-end-column="4" />
+        <state relative-caret-position="142">
+          <caret line="96" column="37" selection-start-line="96" selection-start-column="37" selection-end-line="96" selection-end-column="37" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/plugin.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="23" column="28" selection-start-line="23" selection-start-column="28" selection-end-line="23" selection-end-column="28" />
+          <folding />
         </state>
       </provider>
     </entry>
