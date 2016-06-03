@@ -1,13 +1,13 @@
 package net.extrillius.parkour;
 
+import com.greatmancode.craftconomy3.Common;
+import com.greatmancode.craftconomy3.tools.interfaces.Loader;
 import org.apache.commons.lang3.StringUtils;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,10 +16,13 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
@@ -35,12 +38,15 @@ public class Parkour extends JavaPlugin implements Listener {
     TODO: Add a /add command for people with build licenses.
     TODO: Add special blocks and particle effects
     TODO: Fix the checkpoint + endpoint detection
+    The reason checkpoint/finishpoint detection doesn't work may be because the double is too precise.
     */
     private Set<String> joinedPlayers = new HashSet<>();
     private Set<String> hiddenPlayers = new HashSet<>();
     private HashMap<String, String> playerMap = new HashMap<>();
     private HashMap<String, String> playerCheckpoint = new HashMap<>();
     private HashMap<String, Integer> deathCount = new HashMap<>();
+    private Plugin plugin = getServer().getPluginManager().getPlugin("Craftconomy3");
+    private Common craftconomy = (Common) ((Loader) plugin).getCommon();
 
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
@@ -88,8 +94,7 @@ public class Parkour extends JavaPlugin implements Listener {
     private void killPlayer(Player p) {
         if (!deathCount.containsKey(p.getName())) {
             deathCount.put(p.getName(), 1);
-        }
-        else {
+        } else {
             deathCount.put(p.getName(), deathCount.get(p.getName()) + 1);
         }
 
@@ -103,6 +108,7 @@ public class Parkour extends JavaPlugin implements Listener {
     }
 
     //Lobby teleport command
+    @SuppressWarnings("deprecation")
     private void leaveMap(Player p) {
         p.performCommand("spawn");
         p.sendMessage(ChatColor.AQUA + "You left the map " + ChatColor.GREEN + "" + ChatColor.BOLD +
@@ -115,9 +121,9 @@ public class Parkour extends JavaPlugin implements Listener {
         setLobbyInv(p);
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings("unused, deprecation")
     @EventHandler
-    //Checkpoints, spawns, deathblocks
+    //Checkpoints, spawnpoint, deathblock, endpoint
     public void onMove(PlayerMoveEvent event) {
         Player p = event.getPlayer();
 
@@ -125,7 +131,8 @@ public class Parkour extends JavaPlugin implements Listener {
             if (p.getHealth() != 20) {
                 p.setHealth(20);
             }
-            if (p.getSaturation() != 20) {
+            if (p.getFoodLevel() != 20) {
+                p.setFoodLevel(20);
                 p.setSaturation(20);
             }
         }
@@ -134,7 +141,7 @@ public class Parkour extends JavaPlugin implements Listener {
             String checkpoint = getConfig().getString("maps." + playerMap.get(p.getName()) +
                     ".checkpoint");
             for (String key : getConfig().getConfigurationSection("maps." + playerMap.get(p.getName()) +
-                    ".checkpoint").getKeys(false)) { // Does not work; changed to false, maybe it will work?
+                    ".checkpoint").getKeys(false)) { // Does not work
                 if (p.getLocation().getX() == getConfig().getDouble(key + ".X")) {
                     if (p.getLocation().getY() == getConfig().getDouble("maps." + playerMap.get(key + ".Y"))) {
                         if (p.getLocation().getZ() == getConfig().getDouble(key + ".Z")) {
@@ -179,6 +186,70 @@ public class Parkour extends JavaPlugin implements Listener {
                 }
                 killPlayer(p);
             }
+            if (p.getLocation().getX() == getConfig().getDouble("maps." + playerMap.get(p.getName()) + ".endpoint.X")) {
+                if (p.getLocation().getY() == getConfig().getDouble("maps." + playerMap.get(p.getName()) + ".endpoint.Y")) {
+                    if (p.getLocation().getZ() == getConfig().getDouble("maps." + playerMap.get(p.getName()) +
+                            ".endpoint.Z")) { // does not work
+                        leaveMap(p);
+
+                        Firework f = p.getWorld().spawn(p.getLocation(), Firework.class);
+                        FireworkMeta fm = f.getFireworkMeta();
+
+                        if (getConfig().getString("maps." + playerMap.get(p.getName()) + ".difficulty").equals("EASY")) {
+                            craftconomy.getAccountManager().getAccount(p.getName(), false).deposit(20, p.getWorld()
+                                    .getName(), "$");
+                            p.sendMessage(ChatColor.AQUA + "You have received " + ChatColor.DARK_AQUA + "$20" +
+                                    ChatColor.AQUA
+                                    + " for completing " + ChatColor.GREEN + "" + ChatColor.BOLD + playerMap.get
+                                    (p.getName()) +
+                                    ChatColor.AQUA + "!");
+                            fm.addEffect(FireworkEffect.builder().withColor(Color.YELLOW).with(FireworkEffect.Type.BALL)
+                                    .build());
+                            fm.setPower(1);
+                            f.setFireworkMeta(fm);
+                        } else if (getConfig().getString("maps." + playerMap.get(p.getName()) + ".difficulty").equals
+                                ("MEDIUM")) {
+                            craftconomy.getAccountManager().getAccount(p.getName(), false).deposit(100, p.getWorld().
+                                    getName(), "$");
+                            p.sendMessage(ChatColor.AQUA + "You have received " + ChatColor.DARK_AQUA + "$100" +
+                                    ChatColor.AQUA
+                                    + " for completing " + ChatColor.GREEN + "" + ChatColor.BOLD + playerMap.get
+                                    (p.getName()) +
+                                    ChatColor.AQUA + "!");
+                            fm.addEffect(FireworkEffect.builder().withColor(Color.AQUA).with(FireworkEffect.Type.BALL)
+                                    .build());
+                            fm.setPower(1);
+                            f.setFireworkMeta(fm);
+                        } else if (getConfig().getString(playerMap.get(p.getName()) + ".difficulty").equals("HARD")) {
+                            craftconomy.getAccountManager().getAccount(p.getName(), false).deposit(500, p.getWorld()
+                                    .getName(), "$");
+                            p.sendMessage(ChatColor.AQUA + "You have received " + ChatColor.DARK_GREEN + "$500" +
+                                    ChatColor.AQUA
+                                    + " for completing " + ChatColor.GREEN + "" + ChatColor.BOLD + playerMap.get
+                                    (p.getName()) +
+                                    ChatColor.AQUA + "!");
+                            fm.addEffect(FireworkEffect.builder().withColor(Color.GREEN).with(FireworkEffect.Type.BALL)
+                                    .build());
+                            fm.setPower(1);
+                            f.setFireworkMeta(fm);
+                        } else {
+                            double value = Double.parseDouble(getConfig().getString("maps." + playerMap.get(p.getName())
+                                    + ".difficulty"));
+                            craftconomy.getAccountManager().getAccount(p.getName(), false).deposit(value, p.getWorld()
+                                    .getName(), "$");
+                            p.sendMessage(ChatColor.AQUA + "You have received " + ChatColor.DARK_GREEN + value +
+                                    ChatColor.AQUA
+                                    + " for completing " + ChatColor.GREEN + "" + ChatColor.BOLD + playerMap.get
+                                    (p.getName()) +
+                                    ChatColor.AQUA + "!");
+                            fm.addEffect(FireworkEffect.builder().withColor(Color.RED).with(FireworkEffect.Type.BALL)
+                                    .build());
+                            fm.setPower(1);
+                            f.setFireworkMeta(fm);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -219,6 +290,16 @@ public class Parkour extends JavaPlugin implements Listener {
         Player p = event.getPlayer();
         if (joinedPlayers.contains(p.getName())) {
             leaveMap(p);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player p = event.getPlayer();
+        if (!(joinedPlayers.contains(p.getName()))) {
+            p.getInventory().clear();
+            setLobbyInv(p);
         }
     }
 
@@ -376,13 +457,68 @@ public class Parkour extends JavaPlugin implements Listener {
                 return false;
             } else {
                 String deathBlock = location.getBlock().getRelative(BlockFace.DOWN).getType().toString();
-                p.sendMessage(ChatColor.AQUA + "When you are finished, type " +
-                        ChatColor.GREEN + "/finish <map>");
                 getConfig().set("maps." + args[0] + ".deathblocks", deathBlock);
                 saveConfig();
                 p.sendMessage(ChatColor.AQUA + "Death block " +
                         ChatColor.GREEN + deathBlock.toLowerCase() +
                         ChatColor.AQUA + " has been added.");
+                p.sendMessage(ChatColor.AQUA + "Type " + ChatColor.GREEN + "/difficulty " + ChatColor.AQUA +
+                        "to set the difficulty level for your map.");
+            }
+        }
+        if (cmd.getName().equalsIgnoreCase("difficulty")) {
+            if (args.length != 2) {
+                p.sendMessage(ChatColor.RED + "Difficulty levels:");
+                p.sendMessage(ChatColor.AQUA + "Easy");
+                p.sendMessage(ChatColor.AQUA + "Medium");
+                p.sendMessage(ChatColor.AQUA + "Hard");
+                p.sendMessage(ChatColor.RED + "Usage: " + ChatColor.AQUA + "/difficulty <map> <value>");
+                return false;
+            } else if (!(p.hasPermission("parkour.admin")) || !(p.hasPermission("parkour.build"))) {
+                p.sendMessage(ChatColor.RED + "You don't have permission to create maps!");
+                if (!(p.hasPermission("parkour.build")) && !(p.hasPermission("parkour.admin"))) {
+                    p.sendMessage(ChatColor.AQUA + "You can purchase a build license from the " +
+                            ChatColor.GREEN + "server shop" + ChatColor.AQUA + ", or you can purchase one from our "
+                            + ChatColor.GREEN + "Buycraft store" + ChatColor.AQUA + ".");
+                }
+                return false;
+            } else {
+                if (args[1].equalsIgnoreCase("easy")) {
+                    getConfig().set("maps." + args[0] + ".difficulty", "EASY");
+                } else if (args[1].equalsIgnoreCase("medium")) {
+                    getConfig().set("maps." + args[0] + ".difficulty", "MEDIUM");
+                } else if (args[1].equalsIgnoreCase("hard")) {
+                    getConfig().set("maps." + args[0] + ".difficulty", "HARD");
+                } else {
+                    p.sendMessage(ChatColor.RED + "Difficulty levels:");
+                    p.sendMessage(ChatColor.AQUA + "Easy");
+                    p.sendMessage(ChatColor.AQUA + "Medium");
+                    p.sendMessage(ChatColor.AQUA + "Hard");
+                    return false;
+                }
+                p.sendMessage(ChatColor.AQUA + "Difficulty " + ChatColor.GREEN + args[1] + ChatColor.AQUA +
+                        " set for map " + ChatColor.GREEN + args[0]);
+                p.sendMessage(ChatColor.AQUA + "To check if everything's good to go with your map, type " +
+                        ChatColor.GREEN + "/finish <map>");
+            }
+        }
+        if (cmd.getName().equalsIgnoreCase("customvalue")) {
+            if (!(p.hasPermission("parkour.admin"))) {
+                p.sendMessage(ChatColor.RED + "Setting custom earning amounts is an admin-only command!");
+                p.sendMessage(ChatColor.AQUA + "If you feel like your map deserves a higher earning amount, contact " +
+                        "one of our admins.");
+                return false;
+            } else if (args.length != 2) {
+                p.sendMessage(ChatColor.RED + "Usage: " + ChatColor.AQUA + "/customvalue <map> <value>");
+                return false;
+            } else if (!(StringUtils.isNumeric(args[1]))) {
+                p.sendMessage(ChatColor.RED + "Your second argument must be an double value!");
+                p.sendMessage(ChatColor.RED + "Usage: " + ChatColor.AQUA + "/customvalue <map> <value>");
+                return false;
+            } else {
+                getConfig().set("maps." + args[0] + ".difficulty.", args[1]);
+                p.sendMessage(ChatColor.AQUA + "Custom earning of " + ChatColor.GREEN + args[1] + ChatColor.AQUA +
+                        " has been set for map " + ChatColor.GREEN + args[0]);
             }
         }
         if (cmd.getName().equalsIgnoreCase("finish")) {
@@ -406,13 +542,18 @@ public class Parkour extends JavaPlugin implements Listener {
                     return false;
                 } else if (!(getConfig().contains("maps." + args[0] + ".endpoint"))) {
                     p.sendMessage(ChatColor.RED + "The map " + ChatColor.AQUA + args[0] + ChatColor.RED +
-                            "Does not have an endpoint set!");
+                            "does not have an endpoint set!");
                     p.sendMessage(ChatColor.RED + "Run the /endpoint command again, then run this command again.");
                     return false;
                 } else if (!(getConfig().contains("maps." + args[0] + ".deathblocks"))) {
                     p.sendMessage(ChatColor.RED + "The map " + ChatColor.AQUA + args[0] + ChatColor.RED +
                             " does not have any death blocks set!");
                     p.sendMessage(ChatColor.RED + "Run the /deathblock command again, then run this command again.");
+                    return false;
+                } else if (!(getConfig().contains("maps." + args[0] + ".difficulty"))) {
+                    p.sendMessage(ChatColor.RED + "The map " + ChatColor.AQUA + args[0] + ChatColor.RED + " does not " +
+                            "have a difficulty set!");
+                    p.sendMessage(ChatColor.RED + "Run the /difficulty command again, then run this command again.");
                     return false;
                 } else {
                     p.sendMessage(ChatColor.AQUA + "The map " + ChatColor.GREEN + args[0] +
@@ -456,6 +597,9 @@ public class Parkour extends JavaPlugin implements Listener {
                 p.teleport(mapStart);
                 p.getInventory().clear();
                 setMapInv(p);
+                if (p.getGameMode() != GameMode.SURVIVAL) {
+                    p.setGameMode(GameMode.SURVIVAL);
+                }
                 p.sendMessage(ChatColor.AQUA + "You joined the map " + ChatColor.GREEN + "" + ChatColor.BOLD +
                         playerMap.get(p.getName()));
             }

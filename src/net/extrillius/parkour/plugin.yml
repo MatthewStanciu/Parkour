@@ -16,6 +16,10 @@ commands:
     description: Set the finish point for a created map.
   deathblock:
     description: Set the death blocks for your map
+  difficulty:
+    description: Set the difficulty of your map
+  customvalue:
+    description: Set a custom earning amount for your map.
   finish:
     description: Check to see if your created map is finished.
   join:
