@@ -11,6 +11,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -26,11 +27,11 @@ public class Parkour extends JavaPlugin implements Listener {
 
     /*
     TODO: Add a /add command for people with build licenses.
-    TODO: Find a way to get the map name and make an onJoin method that handles everything that happens in a map,
-    TODO: ...including the player boolean
     */
     private Set<String> joinedPlayers = new HashSet<>();
     private HashMap<String, String> playerMap = new HashMap<>();
+    private HashMap<String, Integer> playerCheckpoint = new HashMap<>();
+    private HashMap<String, Integer> deathCount = new HashMap<>();
 
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
@@ -65,16 +66,135 @@ public class Parkour extends JavaPlugin implements Listener {
         emeraldMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "Server Shop");
         p.getInventory().setItem(5, shopEmerald);
     }
+    private void killPlayer(Player p) {
+        int death = 0;
+        death++;
+        if (deathCount.containsKey(p.getName())) {
+            deathCount.remove(p.getName());
+        }
+        deathCount.put(p.getName(), death);
+
+        if (deathCount.get(p.getName()) == 1) {
+            p.sendMessage(ChatColor.AQUA + "You have " + ChatColor.GREEN + "" + ChatColor.BOLD + "1 " +
+                    ChatColor.AQUA + "death.");
+        }
+        else {
+            p.sendMessage(ChatColor.AQUA + "You have " + ChatColor.GREEN + "" + ChatColor.BOLD
+                    + deathCount.get(p.getName()));
+        }
+    }
+    private void leaveMap(Player p) {
+        p.performCommand("spawn");
+        playerCheckpoint.remove(p.getName());
+        playerMap.remove(p.getName());
+        deathCount.remove(p.getName());
+        joinedPlayers.remove(p.getName());
+        setLobbyInv(p);
+    }
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
         Player p = event.getPlayer();
 
         if (playerMap.containsKey(p.getName())) {
-            //TODO: loop through checkpoint values and check if player is in each one
-            if (p.getLocation().getBlock().getRelative(BlockFace.DOWN) == getConfig().get
-                    ("maps." + playerMap.get(p.getName()) + ".deathblocks")) {
-                //TODO: Teleport the player to each prev. checkpoint or start of map
+            for (String key : getConfig().getConfigurationSection("maps." + playerMap.get(p.getName()) +
+                    ".checkpoint").getKeys(true)) { // key is never used... problems in the future?
+                int checkpoint = Integer.parseInt(getConfig().getString("maps." + playerMap.get(p.getName()) +
+                        ".checkpoint"));
+                if (p.getLocation().getX() == getConfig().getDouble("maps." + playerMap.get(p.getName()) +
+                        ".checkpoint." + checkpoint + ".X")) {
+                    if (p.getLocation().getY() == getConfig().getDouble("maps." + playerMap.get(p.getName()) +
+                            ".checkpoint." + checkpoint + ".Y")) {
+                        if (p.getLocation().getZ() == getConfig().getDouble("maps." + playerMap.get(p.getName()) +
+                                ".checkpoint." + checkpoint + ".Z")) {
+                            if (!(playerCheckpoint.isEmpty())) {
+                                playerCheckpoint.clear();
+                            }
+                            playerCheckpoint.put(p.getName(), checkpoint);
+                        }
+                    }
+                }
+            }
+            if (p.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == getConfig().get
+                    ("maps." + playerMap.get(p.getName()) + ".deathblocks.type")) {
+                Location cp = new Location(p.getWorld(), getConfig().getDouble("maps." + playerMap.get(p.getName()) +
+                        ".checkpoint." + playerCheckpoint.get(p.getName()) + ".X"), getConfig().getDouble("maps." +
+                        playerMap.get(p.getName()) +
+                        ".checkpoint." + playerCheckpoint.get(p.getName()) + ".Y"), getConfig().getDouble("maps." +
+                        playerMap.get(p.getName()) +
+                        ".checkpoint." + playerCheckpoint.get(p.getName()) + ".Z"), getConfig().getInt("maps." +
+                        playerMap.get(p.getName()) +
+                        ".checkpoint." + playerCheckpoint.get(p.getName()) + ".YAW"), getConfig().getInt("maps." +
+                        playerMap.get(p.getName()) +
+                        ".checkpoint." + playerCheckpoint.get(p.getName()) + ".PITCH"));
+                Location start = new Location(p.getWorld(), getConfig().getDouble("maps." + playerMap.get(p.getName()) +
+                        ".startingpoint.X"), getConfig().getDouble("maps." + playerMap.get(p.getName()) +
+                        ".startingpoint.Y"), getConfig().getDouble("maps." + playerMap.get(p.getName()) +
+                        ".startingpoint.Z"), getConfig().getInt("maps." + playerMap.get(p.getName()) +
+                        ".startingpoint.YAW"), getConfig().getInt("maps." + playerMap.get(p.getName()) +
+                        ".startingpoint.PITCH"));
+
+                if (playerCheckpoint.containsKey(p.getName())) {
+                    p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "You died!" + ChatColor.AQUA +
+                            "Teleporting you to checkpoint " + ChatColor.GREEN +
+                            "" + ChatColor.BOLD + playerCheckpoint.get(p.getName()));
+                    p.teleport(cp);
+                }
+                else {
+                    p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "You died!" + ChatColor.AQUA +
+                            "Teleporting you to the start of the map.");
+                    p.teleport(start);
+                }
+                killPlayer(p);
+            }
+        }
+    }
+    @SuppressWarnings("unused")
+    @EventHandler
+    public void onInteract(PlayerInteractEvent event) {
+        Player p = event.getPlayer();
+        ItemStack deathArrow = new ItemStack(Material.ARROW, 1);
+        ItemMeta arrowMeta = deathArrow.getItemMeta();
+        arrowMeta.setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "Suicide");
+
+        ItemStack visBall = new ItemStack(Material.SLIME_BALL, 1);
+        ItemMeta ballMeta = visBall.getItemMeta();
+        ballMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "Players are visible");
+
+        ItemStack leaveStick = new ItemStack(Material.STICK, 1);
+        ItemMeta stickMeta = leaveStick.getItemMeta();
+        stickMeta.setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "Leave the map");
+
+        if (event.getAction() == Action.RIGHT_CLICK_AIR) {
+            if (joinedPlayers.contains(p.getName())) {
+                if (p.getInventory().contains(deathArrow)) {
+                    if (p.getItemInHand() == deathArrow) {
+                        killPlayer(p);
+                    }
+                    if (p.getItemInHand() == visBall) {
+                        if (ballMeta.getDisplayName().equals(ChatColor.GREEN + "" + ChatColor.BOLD +
+                                "Players are visible")) {
+                            for (Player o : getServer().getOnlinePlayers()) {
+                                if (joinedPlayers.contains(o.getName())) {
+                                    p.hidePlayer(o);
+                                    ballMeta.setDisplayName(ChatColor.RED + "" + ChatColor.BOLD +
+                                            "Players are invisible");
+                                }
+                            }
+                        }
+                        if (ballMeta.getDisplayName().equals(ChatColor.RED + "" + ChatColor.BOLD +
+                                "Players are invisible")) {
+                            for (Player o : getServer().getOnlinePlayers()) {
+                                p.showPlayer(o);
+                                ballMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD +
+                                        "Players are visible");
+                            }
+                        }
+                    }
+                    if (p.getItemInHand() == leaveStick) {
+                        leaveMap(p);
+                    }
+                }
             }
         }
     }
@@ -290,13 +410,21 @@ public class Parkour extends JavaPlugin implements Listener {
                     return false;
                 }
                 else {
-                    joinedPlayers.add(p.getName());
+                    if (!(joinedPlayers.contains(p.getName()))) {
+                        joinedPlayers.add(p.getName());
+                    }
                     playerMap.put(p.getName(), args[0]);
                     p.teleport(mapStart);
                     p.getInventory().clear();
                     setMapInv(p);
                 }
             }
+        }
+        if (cmd.getName().equalsIgnoreCase("leave") || cmd.getName().equalsIgnoreCase("quit") ||
+                cmd.getName().equalsIgnoreCase("lobby")) {
+            p.sendMessage(ChatColor.AQUA + "You left the map " + ChatColor.GREEN + "" + ChatColor.BOLD +
+                    playerMap.get(p.getName()));
+            leaveMap(p);
         }
 
         return true;

@@ -28,8 +28,8 @@
       <file leaf-file-name="Parkour.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/Parkour.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
-              <caret line="76" column="84" selection-start-line="76" selection-start-column="84" selection-end-line="76" selection-end-column="84" />
+            <state relative-caret-position="97">
+              <caret line="93" column="4" selection-start-line="93" selection-start-column="4" selection-end-line="93" selection-end-column="4" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -548,7 +548,14 @@
       <option name="project" value="LOCAL" />
       <updated>1464888381118</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="began PlayerMoveEvent; allowed for easy access of maps in config; removed option for multiple death blocks">
+      <created>1464916825073</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1464916825073</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -612,7 +619,8 @@
     <MESSAGE value="Creation aspect finished" />
     <MESSAGE value="Made most of the join aspect" />
     <MESSAGE value="removed unused import" />
-    <option name="LAST_COMMIT_MESSAGE" value="removed unused import" />
+    <MESSAGE value="began PlayerMoveEvent; allowed for easy access of maps in config; removed option for multiple death blocks" />
+    <option name="LAST_COMMIT_MESSAGE" value="began PlayerMoveEvent; allowed for easy access of maps in config; removed option for multiple death blocks" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -736,8 +744,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/Parkour.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="76" column="84" selection-start-line="76" selection-start-column="84" selection-end-line="76" selection-end-column="84" />
+        <state relative-caret-position="97">
+          <caret line="93" column="4" selection-start-line="93" selection-start-column="4" selection-end-line="93" selection-end-column="4" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
