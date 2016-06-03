@@ -38,7 +38,7 @@ public class Parkour extends JavaPlugin implements Listener {
 
         this.saveDefaultConfig();
     }
-
+    //Items players use within maps
     private void setMapInv(Player p) {
         ItemStack deathArrow = new ItemStack(Material.ARROW, 1);
         ItemMeta arrowMeta = deathArrow.getItemMeta();
@@ -55,6 +55,7 @@ public class Parkour extends JavaPlugin implements Listener {
         stickMeta.setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "Leave the map");
         p.getInventory().setItem(7, leaveStick);
     }
+    //Items players use within lobby
     private void setLobbyInv(Player p) {
         ItemStack serverCompass = new ItemStack(Material.COMPASS, 1);
         ItemMeta compassMeta = serverCompass.getItemMeta();
@@ -66,6 +67,7 @@ public class Parkour extends JavaPlugin implements Listener {
         emeraldMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "Server Shop");
         p.getInventory().setItem(5, shopEmerald);
     }
+    //Death counter (broken)
     private void killPlayer(Player p) {
         int death = 0;
         death++;
@@ -83,6 +85,7 @@ public class Parkour extends JavaPlugin implements Listener {
                     + deathCount.get(p.getName()));
         }
     }
+    //Lobby teleport command
     private void leaveMap(Player p) {
         p.performCommand("spawn");
         playerCheckpoint.remove(p.getName());
@@ -93,6 +96,7 @@ public class Parkour extends JavaPlugin implements Listener {
     }
 
     @EventHandler
+    //Checkpoints, spawns, deathblocks
     public void onMove(PlayerMoveEvent event) {
         Player p = event.getPlayer();
 
@@ -150,6 +154,7 @@ public class Parkour extends JavaPlugin implements Listener {
         }
     }
     @SuppressWarnings("unused")
+    //using items within maps
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         Player p = event.getPlayer();
@@ -202,7 +207,7 @@ public class Parkour extends JavaPlugin implements Listener {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         Player p = (Player) sender;
         Location location = p.getLocation();
-
+        //create maps
         if (cmd.getName().equalsIgnoreCase("create")) {
             if (args.length != 1) {
                 p.sendMessage(ChatColor.GRAY + "Usage: " + ChatColor.AQUA + "/create <name>");
@@ -388,7 +393,7 @@ public class Parkour extends JavaPlugin implements Listener {
                 }
             }
         }
-
+        //join maps
         if (cmd.getName().equalsIgnoreCase("join")) {
             World world = p.getWorld();
             double startX = getConfig().getDouble("maps." + args[0] + ".startpoint.X");
