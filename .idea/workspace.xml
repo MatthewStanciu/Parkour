@@ -28,8 +28,8 @@
       <file leaf-file-name="Parkour.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/Parkour.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="113" column="31" selection-start-line="113" selection-start-column="31" selection-end-line="113" selection-end-column="31" />
+            <state relative-caret-position="175">
+              <caret line="36" column="49" selection-start-line="36" selection-start-column="49" selection-end-line="36" selection-end-column="49" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -687,7 +687,14 @@
       <option name="project" value="LOCAL" />
       <updated>1464981795513</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="suppressed warnings on onMove()">
+      <created>1464981824819</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1464981824819</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -755,7 +762,8 @@
     <MESSAGE value="join/leave and player inventories completed, but untested" />
     <MESSAGE value="added &quot;leave&quot; command" />
     <MESSAGE value="Fixed a whole lot of things; checkpoint + endpoint detectoin and death counter still broken" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed a whole lot of things; checkpoint + endpoint detectoin and death counter still broken" />
+    <MESSAGE value="suppressed warnings on onMove()" />
+    <option name="LAST_COMMIT_MESSAGE" value="suppressed warnings on onMove()" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -879,8 +887,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/net/extrillius/parkour/Parkour.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="113" column="31" selection-start-line="113" selection-start-column="31" selection-end-line="113" selection-end-column="31" />
+        <state relative-caret-position="175">
+          <caret line="36" column="49" selection-start-line="36" selection-start-column="49" selection-end-line="36" selection-end-column="49" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

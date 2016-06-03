@@ -33,7 +33,8 @@ public class Parkour extends JavaPlugin implements Listener {
 
     /*
     TODO: Add a /add command for people with build licenses.
-    TODO: Fix the checkpoint + endpoint detecion and death counter
+    TODO: Add special blocks and particle effects
+    TODO: Fix the checkpoint + endpoint detection
     */
     private Set<String> joinedPlayers = new HashSet<>();
     private Set<String> hiddenPlayers = new HashSet<>();
@@ -83,18 +84,21 @@ public class Parkour extends JavaPlugin implements Listener {
         p.getInventory().setItem(4, shopEmerald);
     }
 
-    //Death counter (broken)
+    //Death counter
     private void killPlayer(Player p) {
-        int death = 0;
-        death++;
-        deathCount.put(p.getName(), death);
+        if (!deathCount.containsKey(p.getName())) {
+            deathCount.put(p.getName(), 1);
+        }
+        else {
+            deathCount.put(p.getName(), deathCount.get(p.getName()) + 1);
+        }
 
         if (deathCount.get(p.getName()) == 1) {
             p.sendMessage(ChatColor.AQUA + "You have " + ChatColor.GREEN + "" + ChatColor.BOLD + "1 " +
                     ChatColor.AQUA + "death.");
         } else {
             p.sendMessage(ChatColor.AQUA + "You have " + ChatColor.GREEN + "" + ChatColor.BOLD
-                    + deathCount.get(p.getName()) + " deaths.");
+                    + deathCount.get(p.getName()) + ChatColor.AQUA + " deaths.");
         }
     }
 
