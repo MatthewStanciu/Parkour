@@ -37,8 +37,9 @@ public class Parkour extends JavaPlugin implements Listener {
     /*
     TODO: Add a /add command for people with build licenses.
     TODO: Add special blocks and particle effects
-    TODO: Fix the checkpoint + endpoint detection
+    TODO: Fix the checkpoint detection
     The reason checkpoint/finishpoint detection doesn't work may be because the double is too precise.
+    difficulty is not being set in config. This causes a NullPointerException on finish.
     */
     private Set<String> joinedPlayers = new HashSet<>();
     private Set<String> hiddenPlayers = new HashSet<>();
@@ -186,72 +187,73 @@ public class Parkour extends JavaPlugin implements Listener {
                 }
                 killPlayer(p);
             }
-            if (p.getLocation().getX() == getConfig().getDouble("maps." + playerMap.get(p.getName()) + ".endpoint.X")) {
-                if (p.getLocation().getY() == getConfig().getDouble("maps." + playerMap.get(p.getName()) + ".endpoint.Y")) {
-                    if (p.getLocation().getZ() == getConfig().getDouble("maps." + playerMap.get(p.getName()) +
-                            ".endpoint.Z")) { // does not work
-                        leaveMap(p);
+            if (p.getLocation().getBlockX() == getConfig().getInt("maps." + playerMap.get(p.getName()) + ".endpoint.X")
+                    && p.getLocation().getBlockY() == getConfig().getInt("maps." + playerMap.get(p.getName()) +
+                    ".endpoint.Y")
+                    && p.getLocation().getBlockZ() == getConfig().getInt("maps." + playerMap.get(p.getName()) +
+                    ".endpoint.Z")) {
 
-                        Firework f = p.getWorld().spawn(p.getLocation(), Firework.class);
-                        FireworkMeta fm = f.getFireworkMeta();
+                leaveMap(p);
 
-                        if (getConfig().getString("maps." + playerMap.get(p.getName()) + ".difficulty").equals("EASY")) {
-                            craftconomy.getAccountManager().getAccount(p.getName(), false).deposit(20, p.getWorld()
-                                    .getName(), "$");
-                            p.sendMessage(ChatColor.AQUA + "You have received " + ChatColor.DARK_AQUA + "$20" +
-                                    ChatColor.AQUA
-                                    + " for completing " + ChatColor.GREEN + "" + ChatColor.BOLD + playerMap.get
-                                    (p.getName()) +
-                                    ChatColor.AQUA + "!");
-                            fm.addEffect(FireworkEffect.builder().withColor(Color.YELLOW).with(FireworkEffect.Type.BALL)
-                                    .build());
-                            fm.setPower(1);
-                            f.setFireworkMeta(fm);
-                        } else if (getConfig().getString("maps." + playerMap.get(p.getName()) + ".difficulty").equals
-                                ("MEDIUM")) {
-                            craftconomy.getAccountManager().getAccount(p.getName(), false).deposit(100, p.getWorld().
-                                    getName(), "$");
-                            p.sendMessage(ChatColor.AQUA + "You have received " + ChatColor.DARK_AQUA + "$100" +
-                                    ChatColor.AQUA
-                                    + " for completing " + ChatColor.GREEN + "" + ChatColor.BOLD + playerMap.get
-                                    (p.getName()) +
-                                    ChatColor.AQUA + "!");
-                            fm.addEffect(FireworkEffect.builder().withColor(Color.AQUA).with(FireworkEffect.Type.BALL)
-                                    .build());
-                            fm.setPower(1);
-                            f.setFireworkMeta(fm);
-                        } else if (getConfig().getString(playerMap.get(p.getName()) + ".difficulty").equals("HARD")) {
-                            craftconomy.getAccountManager().getAccount(p.getName(), false).deposit(500, p.getWorld()
-                                    .getName(), "$");
-                            p.sendMessage(ChatColor.AQUA + "You have received " + ChatColor.DARK_GREEN + "$500" +
-                                    ChatColor.AQUA
-                                    + " for completing " + ChatColor.GREEN + "" + ChatColor.BOLD + playerMap.get
-                                    (p.getName()) +
-                                    ChatColor.AQUA + "!");
-                            fm.addEffect(FireworkEffect.builder().withColor(Color.GREEN).with(FireworkEffect.Type.BALL)
-                                    .build());
-                            fm.setPower(1);
-                            f.setFireworkMeta(fm);
-                        } else {
-                            double value = Double.parseDouble(getConfig().getString("maps." + playerMap.get(p.getName())
-                                    + ".difficulty"));
-                            craftconomy.getAccountManager().getAccount(p.getName(), false).deposit(value, p.getWorld()
-                                    .getName(), "$");
-                            p.sendMessage(ChatColor.AQUA + "You have received " + ChatColor.DARK_GREEN + value +
-                                    ChatColor.AQUA
-                                    + " for completing " + ChatColor.GREEN + "" + ChatColor.BOLD + playerMap.get
-                                    (p.getName()) +
-                                    ChatColor.AQUA + "!");
-                            fm.addEffect(FireworkEffect.builder().withColor(Color.RED).with(FireworkEffect.Type.BALL)
-                                    .build());
-                            fm.setPower(1);
-                            f.setFireworkMeta(fm);
-                        }
-                    }
+                Firework f = p.getWorld().spawn(p.getLocation(), Firework.class);
+                FireworkMeta fm = f.getFireworkMeta();
+
+                if (getConfig().getString("maps." + playerMap.get(p.getName()) + ".difficulty").equals("EASY")) {
+                    craftconomy.getAccountManager().getAccount(p.getName(), false).deposit(20, p.getWorld()
+                            .getName(), "$");
+                    p.sendMessage(ChatColor.AQUA + "You have received " + ChatColor.DARK_AQUA + "$20" +
+                            ChatColor.AQUA
+                            + " for completing " + ChatColor.GREEN + "" + ChatColor.BOLD + playerMap.get
+                            (p.getName()) +
+                            ChatColor.AQUA + "!");
+                    fm.addEffect(FireworkEffect.builder().withColor(Color.YELLOW).with(FireworkEffect.Type.BALL)
+                            .build());
+                    fm.setPower(1);
+                    f.setFireworkMeta(fm);
+                } else if (getConfig().getString("maps." + playerMap.get(p.getName()) + ".difficulty").equals
+                        ("MEDIUM")) {
+                    craftconomy.getAccountManager().getAccount(p.getName(), false).deposit(100, p.getWorld().
+                            getName(), "$");
+                    p.sendMessage(ChatColor.AQUA + "You have received " + ChatColor.DARK_AQUA + "$100" +
+                            ChatColor.AQUA
+                            + " for completing " + ChatColor.GREEN + "" + ChatColor.BOLD + playerMap.get
+                            (p.getName()) +
+                            ChatColor.AQUA + "!");
+                    fm.addEffect(FireworkEffect.builder().withColor(Color.AQUA).with(FireworkEffect.Type.BALL)
+                            .build());
+                    fm.setPower(1);
+                    f.setFireworkMeta(fm);
+                } else if (getConfig().getString(playerMap.get(p.getName()) + ".difficulty").equals("HARD")) {
+                    craftconomy.getAccountManager().getAccount(p.getName(), false).deposit(500, p.getWorld()
+                            .getName(), "$");
+                    p.sendMessage(ChatColor.AQUA + "You have received " + ChatColor.DARK_GREEN + "$500" +
+                            ChatColor.AQUA
+                            + " for completing " + ChatColor.GREEN + "" + ChatColor.BOLD + playerMap.get
+                            (p.getName()) +
+                            ChatColor.AQUA + "!");
+                    fm.addEffect(FireworkEffect.builder().withColor(Color.GREEN).with(FireworkEffect.Type.BALL)
+                            .build());
+                    fm.setPower(1);
+                    f.setFireworkMeta(fm);
+                } else {
+                    double value = Double.parseDouble(getConfig().getString("maps." + playerMap.get(p.getName())
+                            + ".difficulty"));
+                    craftconomy.getAccountManager().getAccount(p.getName(), false).deposit(value, p.getWorld()
+                            .getName(), "$");
+                    p.sendMessage(ChatColor.AQUA + "You have received " + ChatColor.DARK_GREEN + value +
+                            ChatColor.AQUA
+                            + " for completing " + ChatColor.GREEN + "" + ChatColor.BOLD + playerMap.get
+                            (p.getName()) +
+                            ChatColor.AQUA + "!");
+                    fm.addEffect(FireworkEffect.builder().withColor(Color.RED).with(FireworkEffect.Type.BALL)
+                            .build());
+                    fm.setPower(1);
+                    f.setFireworkMeta(fm);
                 }
             }
         }
     }
+
 
     @SuppressWarnings("unused")
     //using items within maps
@@ -405,9 +407,9 @@ public class Parkour extends JavaPlugin implements Listener {
                 return false;
             } else {
                 int value = Integer.parseInt(args[1]);
-                getConfig().set("maps." + args[0] + ".checkpoint." + value + ".X", location.getX());
-                getConfig().set("maps." + args[0] + ".checkpoint." + value + ".Y", location.getY());
-                getConfig().set("maps." + args[0] + ".checkpoint." + value + ".Z", location.getZ());
+                getConfig().set("maps." + args[0] + ".checkpoint." + value + ".X", location.getBlockX());
+                getConfig().set("maps." + args[0] + ".checkpoint." + value + ".Y", location.getBlockY());
+                getConfig().set("maps." + args[0] + ".checkpoint." + value + ".Z", location.getBlockZ());
                 getConfig().set("maps." + args[0] + ".checkpoint." + value + ".YAW", location.getYaw());
                 getConfig().set("maps." + args[0] + ".checkpoint." + value + ".PITCH", location.getPitch());
                 saveConfig();
@@ -430,9 +432,9 @@ public class Parkour extends JavaPlugin implements Listener {
                 }
                 return false;
             } else {
-                getConfig().set("maps." + args[0] + ".endpoint.X", location.getX());
-                getConfig().set("maps." + args[0] + ".endpoint.Y", location.getY());
-                getConfig().set("maps." + args[0] + ".endpoint.Z", location.getZ());
+                getConfig().set("maps." + args[0] + ".endpoint.X", location.getBlockX());
+                getConfig().set("maps." + args[0] + ".endpoint.Y", location.getBlockY());
+                getConfig().set("maps." + args[0] + ".endpoint.Z", location.getBlockZ());
                 getConfig().set("maps." + args[0] + ".endpoint.YAW", location.getYaw());
                 getConfig().set("maps." + args[0] + ".endpoint.PITCH", location.getPitch());
                 saveConfig();
@@ -483,7 +485,7 @@ public class Parkour extends JavaPlugin implements Listener {
                 }
                 return false;
             } else {
-                if (args[1].equalsIgnoreCase("easy")) {
+                if (args[1].equalsIgnoreCase("easy")) { // seems like this isn't setting correctly...
                     getConfig().set("maps." + args[0] + ".difficulty", "EASY");
                 } else if (args[1].equalsIgnoreCase("medium")) {
                     getConfig().set("maps." + args[0] + ".difficulty", "MEDIUM");
