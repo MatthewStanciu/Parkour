@@ -37,14 +37,16 @@ public class Parkour extends JavaPlugin implements Listener {
     /*
     TODO: Add a /add command for people with build licenses.
     TODO: Add special blocks and particle effects
-    TODO: Fix the checkpoint detection
-    The reason checkpoint/finishpoint detection doesn't work may be because the double is too precise.
-    difficulty is not being set in config. This causes a NullPointerException on finish.
+    TODO: Test the checkpoint detection
+    TODO: Fix the CraftConomy payment (method deprecated)
+    checkpoint is reached more than once; (fixed; needs to be tested)
+    difficulty is not being set in config. This causes a NullPointerException on finish. (fixed; needs to be tested)
     */
     private Set<String> joinedPlayers = new HashSet<>();
     private Set<String> hiddenPlayers = new HashSet<>();
     private HashMap<String, String> playerMap = new HashMap<>();
     private HashMap<String, String> playerCheckpoint = new HashMap<>();
+    private HashMap<String, String> checkCheckpoint = new HashMap<>();
     private HashMap<String, Integer> deathCount = new HashMap<>();
     private Plugin plugin = getServer().getPluginManager().getPlugin("Craftconomy3");
     private Common craftconomy = (Common) ((Loader) plugin).getCommon();
@@ -139,23 +141,26 @@ public class Parkour extends JavaPlugin implements Listener {
         }
 
         if (playerMap.containsKey(p.getName())) {
-            String checkpoint = getConfig().getString("maps." + playerMap.get(p.getName()) +
-                    ".checkpoint");
-            for (String key : getConfig().getConfigurationSection("maps." + playerMap.get(p.getName()) +
+            for (String checkpoint : getConfig().getConfigurationSection("maps." + playerMap.get(p.getName()) +
                     ".checkpoint").getKeys(false)) { // Does not work
-                if (p.getLocation().getX() == getConfig().getDouble(key + ".X")) {
-                    if (p.getLocation().getY() == getConfig().getDouble("maps." + playerMap.get(key + ".Y"))) {
-                        if (p.getLocation().getZ() == getConfig().getDouble(key + ".Z")) {
-                            if (!(playerCheckpoint.isEmpty())) {
-                                playerCheckpoint.clear();
-                            }
-                            playerCheckpoint.put(p.getName(), checkpoint);
-                            p.sendMessage(ChatColor.AQUA + "You have reached checkpoint " + ChatColor.GREEN +
-                                    ChatColor.BOLD + checkpoint);
-                        }
+                if (p.getLocation().getBlockX() == getConfig().getInt("maps." + playerMap.get(p.getName()) +
+                        ".checkpoint." + checkpoint + ".X")
+                        && p.getLocation().getBlockY() == getConfig().getInt("maps." + playerMap.get(p.getName()) +
+                        ".checkpoint." + checkpoint + ".Y")
+                        && p.getLocation().getBlockZ() == getConfig().getInt("maps." + playerMap.get(p.getName()) +
+                        ".checkpoint." + checkpoint + ".Z")) {
+                    if (!(playerCheckpoint.isEmpty())) {
+                        playerCheckpoint.clear();
+                    }
+                    if (!(checkCheckpoint.get(p.getName()).equals(playerCheckpoint.get(p.getName())))) {
+                        playerCheckpoint.put(p.getName(), checkpoint);
+                        p.sendMessage(ChatColor.AQUA + "You have reached checkpoint " + ChatColor.GREEN +
+                                ChatColor.BOLD + checkpoint);
+                        checkCheckpoint.put(p.getName(), checkpoint);
                     }
                 }
             }
+
             if (p.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().toString().equals(getConfig()
                     .getString("maps." + playerMap.get(p.getName()) + ".deathblocks"))) {
                 Location cp = new Location(p.getWorld(), getConfig().getDouble("maps." + playerMap.get(p.getName()) +
@@ -486,11 +491,11 @@ public class Parkour extends JavaPlugin implements Listener {
                 return false;
             } else {
                 if (args[1].equalsIgnoreCase("easy")) { // seems like this isn't setting correctly...
-                    getConfig().set("maps." + args[0] + ".difficulty", "EASY");
+                    getConfig().set("maps." + args[0] + ".difficulty", args[1].toUpperCase());
                 } else if (args[1].equalsIgnoreCase("medium")) {
-                    getConfig().set("maps." + args[0] + ".difficulty", "MEDIUM");
+                    getConfig().set("maps." + args[0] + ".difficulty", args[1].toUpperCase());
                 } else if (args[1].equalsIgnoreCase("hard")) {
-                    getConfig().set("maps." + args[0] + ".difficulty", "HARD");
+                    getConfig().set("maps." + args[0] + ".difficulty", args[1].toUpperCase());
                 } else {
                     p.sendMessage(ChatColor.RED + "Difficulty levels:");
                     p.sendMessage(ChatColor.AQUA + "Easy");
