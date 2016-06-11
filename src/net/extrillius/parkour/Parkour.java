@@ -44,6 +44,8 @@ public class Parkour extends JavaPlugin implements Listener {
     TODO: Force commands to be run in order.
     TODO: Make a timer that starts when a player joins a map and ends when they leave it. Then make leaderboards
     checkpoint is reached more than once; (fixed; needs to be tested)
+    craftconomy adding funds is deprecated, no docs. contact greatman?
+    getOnlinePlayers() is deprecated, apparently
     */
     private Set<String> joinedPlayers = new HashSet<>();
     private Set<String> hiddenPlayers = new HashSet<>();
