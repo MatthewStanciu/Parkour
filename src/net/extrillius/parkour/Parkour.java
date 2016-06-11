@@ -2,7 +2,7 @@ package net.extrillius.parkour;
 
 import com.greatmancode.craftconomy3.Common;
 import com.greatmancode.craftconomy3.tools.interfaces.Loader;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
@@ -39,8 +39,11 @@ public class Parkour extends JavaPlugin implements Listener {
     TODO: Add special blocks and particle effects
     TODO: Test the checkpoint detection
     TODO: Fix the CraftConomy payment (method deprecated)
+    TODO: Check if map does not exist before setting when running commands.
+    TODO: Make it so that people with build licenses but not admin perms can only edit their own maps, or their friends' if added
+    TODO: Force commands to be run in order.
+    TODO: Make a timer that starts when a player joins a map and ends when they leave it. Then make leaderboards
     checkpoint is reached more than once; (fixed; needs to be tested)
-    difficulty is not being set in config. This causes a NullPointerException on finish. (fixed; needs to be tested)
     */
     private Set<String> joinedPlayers = new HashSet<>();
     private Set<String> hiddenPlayers = new HashSet<>();
@@ -114,8 +117,6 @@ public class Parkour extends JavaPlugin implements Listener {
     @SuppressWarnings("deprecation")
     private void leaveMap(Player p) {
         p.performCommand("spawn");
-        p.sendMessage(ChatColor.AQUA + "You left the map " + ChatColor.GREEN + "" + ChatColor.BOLD +
-                playerMap.get(p.getName()));
         playerCheckpoint.remove(p.getName());
         playerMap.remove(p.getName());
         deathCount.remove(p.getName());
@@ -152,11 +153,13 @@ public class Parkour extends JavaPlugin implements Listener {
                     if (!(playerCheckpoint.isEmpty())) {
                         playerCheckpoint.clear();
                     }
+                    if (!(checkCheckpoint.isEmpty())) {
+                        checkCheckpoint.clear();
+                    }
                     if (!(checkCheckpoint.get(p.getName()).equals(playerCheckpoint.get(p.getName())))) {
-                        playerCheckpoint.put(p.getName(), checkpoint);
                         p.sendMessage(ChatColor.AQUA + "You have reached checkpoint " + ChatColor.GREEN +
                                 ChatColor.BOLD + checkpoint);
-                        checkCheckpoint.put(p.getName(), checkpoint);
+                        checkCheckpoint.put(p.getName(), playerCheckpoint.get(p.getName()));
                     }
                 }
             }
@@ -198,6 +201,8 @@ public class Parkour extends JavaPlugin implements Listener {
                     && p.getLocation().getBlockZ() == getConfig().getInt("maps." + playerMap.get(p.getName()) +
                     ".endpoint.Z")) {
 
+                p.sendMessage(ChatColor.AQUA + "You finished the map " + ChatColor.GREEN + "" + ChatColor.BOLD +
+                        playerMap.get(p.getName()) + ChatColor.AQUA + "" + ChatColor.BOLD + "!");
                 leaveMap(p);
 
                 Firework f = p.getWorld().spawn(p.getLocation(), Firework.class);
@@ -286,6 +291,8 @@ public class Parkour extends JavaPlugin implements Listener {
                 }
                 if (p.getItemInHand().getType() == Material.STICK) {
                     leaveMap(p);
+                    p.sendMessage(ChatColor.AQUA + "You left the map " + ChatColor.GREEN + "" + ChatColor.BOLD +
+                            playerMap.get(p.getName()));
                 }
             }
         }
@@ -406,7 +413,7 @@ public class Parkour extends JavaPlugin implements Listener {
                             + ChatColor.GREEN + "Buycraft store" + ChatColor.AQUA + ".");
                 }
                 return false;
-            } else if (!StringUtils.isNumeric(args[1])) {
+            } else if (!(StringUtils.isNumeric(args[1]))) {
                 p.sendMessage(ChatColor.RED + "Your second argument must be an integer!");
                 p.sendMessage(ChatColor.GRAY + "Usage: " + ChatColor.AQUA + "/checkpoint <map> <value>");
                 return false;
@@ -475,13 +482,11 @@ public class Parkour extends JavaPlugin implements Listener {
         }
         if (cmd.getName().equalsIgnoreCase("difficulty")) {
             if (args.length != 2) {
-                p.sendMessage(ChatColor.RED + "Difficulty levels:");
-                p.sendMessage(ChatColor.AQUA + "Easy");
-                p.sendMessage(ChatColor.AQUA + "Medium");
-                p.sendMessage(ChatColor.AQUA + "Hard");
-                p.sendMessage(ChatColor.RED + "Usage: " + ChatColor.AQUA + "/difficulty <map> <value>");
+                p.sendMessage(ChatColor.RED + "Difficulty levels: " + ChatColor.YELLOW + "EASY" + ChatColor.RED + ","
+                        + ChatColor.AQUA + " MEDIUM" + ChatColor.RED + "," + ChatColor.GREEN + " HARD");
                 return false;
-            } else if (!(p.hasPermission("parkour.admin")) || !(p.hasPermission("parkour.build"))) {
+            }
+            else if (!(p.hasPermission("parkour.admin")) || !(p.hasPermission("parkour.build"))) {
                 p.sendMessage(ChatColor.RED + "You don't have permission to create maps!");
                 if (!(p.hasPermission("parkour.build")) && !(p.hasPermission("parkour.admin"))) {
                     p.sendMessage(ChatColor.AQUA + "You can purchase a build license from the " +
@@ -489,24 +494,21 @@ public class Parkour extends JavaPlugin implements Listener {
                             + ChatColor.GREEN + "Buycraft store" + ChatColor.AQUA + ".");
                 }
                 return false;
-            } else {
-                if (args[1].equalsIgnoreCase("easy")) { // seems like this isn't setting correctly...
+            }
+            else {
+                if (args[1].equalsIgnoreCase("easy") || args[1].equalsIgnoreCase("medium") ||
+                        args[1].equalsIgnoreCase("hard")) {
                     getConfig().set("maps." + args[0] + ".difficulty", args[1].toUpperCase());
-                } else if (args[1].equalsIgnoreCase("medium")) {
-                    getConfig().set("maps." + args[0] + ".difficulty", args[1].toUpperCase());
-                } else if (args[1].equalsIgnoreCase("hard")) {
-                    getConfig().set("maps." + args[0] + ".difficulty", args[1].toUpperCase());
-                } else {
-                    p.sendMessage(ChatColor.RED + "Difficulty levels:");
-                    p.sendMessage(ChatColor.AQUA + "Easy");
-                    p.sendMessage(ChatColor.AQUA + "Medium");
-                    p.sendMessage(ChatColor.AQUA + "Hard");
+                    saveConfig();
+                    p.sendMessage(ChatColor.AQUA + "Difficulty " + ChatColor.GREEN + args[1] + ChatColor.AQUA + " set!");
+                    p.sendMessage(ChatColor.AQUA + "Type " + ChatColor.GREEN + "/finish <map> " + ChatColor.AQUA
+                            + "to check if your map is complete.");
+                }
+                else {
+                    p.sendMessage(ChatColor.RED + "Difficulty levels: " + ChatColor.YELLOW + "EASY" + ChatColor.RED + ","
+                            + ChatColor.AQUA + " MEDIUM" + ChatColor.RED + "," + ChatColor.GREEN + " HARD");
                     return false;
                 }
-                p.sendMessage(ChatColor.AQUA + "Difficulty " + ChatColor.GREEN + args[1] + ChatColor.AQUA +
-                        " set for map " + ChatColor.GREEN + args[0]);
-                p.sendMessage(ChatColor.AQUA + "To check if everything's good to go with your map, type " +
-                        ChatColor.GREEN + "/finish <map>");
             }
         }
         if (cmd.getName().equalsIgnoreCase("customvalue")) {
@@ -618,6 +620,8 @@ public class Parkour extends JavaPlugin implements Listener {
             }
             if (joinedPlayers.contains(p.getName())) {
                 leaveMap(p);
+                p.sendMessage(ChatColor.AQUA + "You left the map " + ChatColor.GREEN + "" + ChatColor.BOLD +
+                        playerMap.get(p.getName()));
             } else {
                 p.sendMessage(ChatColor.AQUA + "You are not in a map!");
             }
