@@ -7,6 +7,8 @@ main: net.extrillius.parkour.Parkour
 commands:
   create:
     description: Being creating a map
+  delete:
+    description: Delete a map from the config file
   startpoint:
     description: Set the starting point for a created map.
   checkpoint:

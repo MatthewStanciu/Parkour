@@ -1,7 +1,5 @@
 package net.extrillius.parkour;
 
-import com.greatmancode.craftconomy3.Common;
-import com.greatmancode.craftconomy3.tools.interfaces.Loader;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
@@ -22,7 +20,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
@@ -36,6 +33,7 @@ public class Parkour extends JavaPlugin implements Listener {
 
     /*
     TODO: Add a /add command for people with build licenses.
+    TODO: Allow people with build licenses to add other people to their maps.
     TODO: Add special blocks and particle effects
     TODO: Test the checkpoint detection
     TODO: Fix the CraftConomy payment (method deprecated)
@@ -43,9 +41,9 @@ public class Parkour extends JavaPlugin implements Listener {
     TODO: Make it so that people with build licenses but not admin perms can only edit their own maps, or their friends' if added
     TODO: Force commands to be run in order.
     TODO: Make a timer that starts when a player joins a map and ends when they leave it. Then make leaderboards
-    checkpoint is reached more than once; (fixed; needs to be tested)
-    craftconomy adding funds is deprecated, no docs. contact greatman?
-    getOnlinePlayers() is deprecated, apparently
+    checkpoint is reached more than once
+    Endpoint detection causes NPE (check console logs)
+    Gotta find a way to do the whole funds thing
     */
     private Set<String> joinedPlayers = new HashSet<>();
     private Set<String> hiddenPlayers = new HashSet<>();
@@ -53,8 +51,6 @@ public class Parkour extends JavaPlugin implements Listener {
     private HashMap<String, String> playerCheckpoint = new HashMap<>();
     private HashMap<String, String> checkCheckpoint = new HashMap<>();
     private HashMap<String, Integer> deathCount = new HashMap<>();
-    private Plugin plugin = getServer().getPluginManager().getPlugin("Craftconomy3");
-    private Common craftconomy = (Common) ((Loader) plugin).getCommon();
 
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
@@ -116,10 +112,10 @@ public class Parkour extends JavaPlugin implements Listener {
     }
 
     //Lobby teleport command
-    @SuppressWarnings("deprecation")
     private void leaveMap(Player p) {
         p.performCommand("spawn");
         playerCheckpoint.remove(p.getName());
+        checkCheckpoint.remove(p.getName());
         playerMap.remove(p.getName());
         deathCount.remove(p.getName());
         joinedPlayers.remove(p.getName());
@@ -127,7 +123,7 @@ public class Parkour extends JavaPlugin implements Listener {
         setLobbyInv(p);
     }
 
-    @SuppressWarnings("unused, deprecation")
+    @SuppressWarnings("unused")
     @EventHandler
     //Checkpoints, spawnpoint, deathblock, endpoint
     public void onMove(PlayerMoveEvent event) {
@@ -152,17 +148,15 @@ public class Parkour extends JavaPlugin implements Listener {
                         ".checkpoint." + checkpoint + ".Y")
                         && p.getLocation().getBlockZ() == getConfig().getInt("maps." + playerMap.get(p.getName()) +
                         ".checkpoint." + checkpoint + ".Z")) {
-                    if (!(playerCheckpoint.isEmpty())) {
-                        playerCheckpoint.clear();
-                    }
-                    if (!(checkCheckpoint.isEmpty())) {
-                        checkCheckpoint.clear();
-                    }
-                    if (!(checkCheckpoint.get(p.getName()).equals(playerCheckpoint.get(p.getName())))) {
-                        p.sendMessage(ChatColor.AQUA + "You have reached checkpoint " + ChatColor.GREEN +
+
+                    if (!(checkCheckpoint.isEmpty()) && !(playerCheckpoint.isEmpty())
+                            && checkCheckpoint.get(p.getName()).equals(playerCheckpoint.get(p.getName()))
+                            || (checkCheckpoint.isEmpty() && playerCheckpoint.isEmpty())) {
+                        playerCheckpoint.put(p.getName(), checkpoint);
+                        p.sendMessage(ChatColor.AQUA + "You have reached checkpoint " + ChatColor.GREEN + "" +
                                 ChatColor.BOLD + checkpoint);
-                        checkCheckpoint.put(p.getName(), playerCheckpoint.get(p.getName()));
-                    }
+                        checkCheckpoint.put(p.getName(), checkpoint);
+                    } // all of this is redundant. A different method must be taken.
                 }
             }
 
@@ -210,9 +204,9 @@ public class Parkour extends JavaPlugin implements Listener {
                 Firework f = p.getWorld().spawn(p.getLocation(), Firework.class);
                 FireworkMeta fm = f.getFireworkMeta();
 
-                if (getConfig().getString("maps." + playerMap.get(p.getName()) + ".difficulty").equals("EASY")) {
-                    craftconomy.getAccountManager().getAccount(p.getName(), false).deposit(20, p.getWorld()
-                            .getName(), "$");
+                if (getConfig().getString("maps." + playerMap.get(p.getName()) + ".difficulty").equals("EASY")) { // NPE?
+                    //craftconomy.getAccountManager().getAccount(p.getName(), false).deposit(20, p.getWorld()
+                            //.getName(), "$");
                     p.sendMessage(ChatColor.AQUA + "You have received " + ChatColor.DARK_AQUA + "$20" +
                             ChatColor.AQUA
                             + " for completing " + ChatColor.GREEN + "" + ChatColor.BOLD + playerMap.get
@@ -224,8 +218,8 @@ public class Parkour extends JavaPlugin implements Listener {
                     f.setFireworkMeta(fm);
                 } else if (getConfig().getString("maps." + playerMap.get(p.getName()) + ".difficulty").equals
                         ("MEDIUM")) {
-                    craftconomy.getAccountManager().getAccount(p.getName(), false).deposit(100, p.getWorld().
-                            getName(), "$");
+                    //craftconomy.getAccountManager().getAccount(p.getName(), false).deposit(100, p.getWorld().
+                            //getName(), "$");
                     p.sendMessage(ChatColor.AQUA + "You have received " + ChatColor.DARK_AQUA + "$100" +
                             ChatColor.AQUA
                             + " for completing " + ChatColor.GREEN + "" + ChatColor.BOLD + playerMap.get
@@ -236,8 +230,8 @@ public class Parkour extends JavaPlugin implements Listener {
                     fm.setPower(1);
                     f.setFireworkMeta(fm);
                 } else if (getConfig().getString(playerMap.get(p.getName()) + ".difficulty").equals("HARD")) {
-                    craftconomy.getAccountManager().getAccount(p.getName(), false).deposit(500, p.getWorld()
-                            .getName(), "$");
+                    //craftconomy.getAccountManager().getAccount(p.getName(), false).deposit(500, p.getWorld()
+                            //.getName(), "$");
                     p.sendMessage(ChatColor.AQUA + "You have received " + ChatColor.DARK_GREEN + "$500" +
                             ChatColor.AQUA
                             + " for completing " + ChatColor.GREEN + "" + ChatColor.BOLD + playerMap.get
@@ -250,8 +244,8 @@ public class Parkour extends JavaPlugin implements Listener {
                 } else {
                     double value = Double.parseDouble(getConfig().getString("maps." + playerMap.get(p.getName())
                             + ".difficulty"));
-                    craftconomy.getAccountManager().getAccount(p.getName(), false).deposit(value, p.getWorld()
-                            .getName(), "$");
+                    //craftconomy.getAccountManager().getAccount(p.getName(), false).deposit(value, p.getWorld()
+                            //.getName(), "$");
                     p.sendMessage(ChatColor.AQUA + "You have received " + ChatColor.DARK_GREEN + value +
                             ChatColor.AQUA
                             + " for completing " + ChatColor.GREEN + "" + ChatColor.BOLD + playerMap.get
@@ -421,9 +415,13 @@ public class Parkour extends JavaPlugin implements Listener {
                 return false;
             } else {
                 int value = Integer.parseInt(args[1]);
-                getConfig().set("maps." + args[0] + ".checkpoint." + value + ".X", location.getBlockX());
-                getConfig().set("maps." + args[0] + ".checkpoint." + value + ".Y", location.getBlockY());
-                getConfig().set("maps." + args[0] + ".checkpoint." + value + ".Z", location.getBlockZ());
+                getConfig().set("maps." + args[0] + ".checkpoint." + value + ".blockX", location.getBlockX());
+                getConfig().set("maps." + args[0] + ".checkpoint." + value + ".blockY", location.getBlockY());
+                getConfig().set("maps." + args[0] + ".checkpoint." + value + ".blockZ", location.getBlockZ());
+                saveConfig();
+                getConfig().set("maps." + args[0] + ".checkpoint." + value + ".X", location.getX());
+                getConfig().set("maps." + args[0] + ".checkpoint." + value + ".Y", location.getY());
+                getConfig().set("maps." + args[0] + ".checkpoint." + value + ".Z", location.getZ());
                 getConfig().set("maps." + args[0] + ".checkpoint." + value + ".YAW", location.getYaw());
                 getConfig().set("maps." + args[0] + ".checkpoint." + value + ".PITCH", location.getPitch());
                 saveConfig();
@@ -621,11 +619,37 @@ public class Parkour extends JavaPlugin implements Listener {
                 return false;
             }
             if (joinedPlayers.contains(p.getName())) {
-                leaveMap(p);
                 p.sendMessage(ChatColor.AQUA + "You left the map " + ChatColor.GREEN + "" + ChatColor.BOLD +
                         playerMap.get(p.getName()));
+                leaveMap(p);
             } else {
                 p.sendMessage(ChatColor.AQUA + "You are not in a map!");
+            }
+        }
+        if (cmd.getName().equalsIgnoreCase("delete")) {
+            if (args.length != 1) {
+                p.sendMessage(ChatColor.GRAY + "Usage: " + ChatColor.AQUA + "/delete <map>");
+                return false;
+            } else if (!(p.hasPermission("parkour.admin")) || !(p.hasPermission("parkour.build"))) {
+                p.sendMessage(ChatColor.RED + "You don't have permission to create maps!");
+                if (!(p.hasPermission("parkour.build")) && !(p.hasPermission("parkour.admin"))) {
+                    p.sendMessage(ChatColor.AQUA + "You can purchase a build license from the " +
+                            ChatColor.GREEN + "server shop" + ChatColor.AQUA + ", or you can purchase one from our "
+                            + ChatColor.GREEN + "Buycraft store" + ChatColor.AQUA + ".");
+                }
+                return false;
+            }
+
+            if (!(getConfig().contains("maps." + args[0]))) {
+                p.sendMessage(ChatColor.RED + "This map does not exist!");
+                return false;
+            }
+            else { // needs to be tested!
+                getConfig().set("maps." + args[0], null);
+                saveConfig();
+                reloadConfig();
+                p.sendMessage(ChatColor.AQUA + "Map " + ChatColor.GREEN + "" + ChatColor.BOLD + args[0] +
+                        ChatColor.AQUA + " has been deleted!");
             }
         }
 

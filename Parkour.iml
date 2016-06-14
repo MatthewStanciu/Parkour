@@ -10,12 +10,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/Downloads/craftconomy3-3.3.jar!/" />
-          <root url="jar://$USER_HOME$/Downloads/Spigot.jar!/" />
+          <root url="jar://$USER_HOME$/Downloads/spigot_server.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/Downloads/Spigot.jar!/" />
+          <root url="jar://$USER_HOME$/Downloads/spigot_server.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
